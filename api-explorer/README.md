@@ -4,6 +4,8 @@ The Apcera API Explorer is a web application that lets you experiment with and l
 
 ## Running the API Explorer
 
+The API Explorer takes as input a JSON file (a Swagger specification) that describes each REST API endpoint. To use API Explorer with your cluster, you need to edit this JSON file to point to the API host on your cluster (`api.your-cluster.example.com`, for example). 
+
 Due to cross-domain restrictions in web browsers, you must run API Explorer on a local web server at `localhost:9000`. Your Apcera cluster will not accept requests if the app is running on another domain. 
 
 1. Open **apcera-api.json** in a text editor.
@@ -18,13 +20,14 @@ Due to cross-domain restrictions in web browsers, you must run API Explorer on a
         
 8. Open [http://localhost:9000](http://localhost:9000).
    
+## Providing your API token
 
-## Getting your API token
-
-To make API calls from the API Explorer against your Apcera cluster you need to provide your API token. Once you've [logged in to your cluster using APC](http://docs.apcera.com/quickstart/installing-apc/#targeting-your-platform-and-logging-in-using-apc), you can find your API token in the `$HOME/.apc` file.
+To make API calls you need to provide your API token. An easy to obtain your API token is from the `$HOME/.apc` file. This file is created by APC and contains the API tokens for each cluster you have targeted.
    
-1. Open `$HOME/.apc` in an editor and copy the API token to your clipboard. Don't include the **Bearer** preamble in the copied string, just the token value ("**eyJ0eXAiO**...", for example).
-    
+**To provide your API token**:
+
+1. Open `~./apc` (or `$HOME/.apc`) in a text editor.
+2. Locate the `tokens` field for your cluster, e.g.
         {
           "target": "https://mycluster.apcera-platform.io:443",
           "tokens": {
@@ -32,5 +35,20 @@ To make API calls from the API Explorer against your Apcera cluster you need to 
           },
           ...
         }
+3. Copy the value of the API token for your cluster, with or without the "Bearer " preamble.  
+4. In Apcera API Explorer, paste the token into the **API Token** field and click the arrow. 
 
-2. In Apcera API Explorer, paste the token into the **Token** field, then click the arrow. You're now ready to make calls from the API Explorer.
+    ![Alt text](addtoken.png "API token")
+   
+
+You're now ready to make calls from the API Explorer. 
+
+## Making API call
+
+To make an API call, locate the API you want to invoke in the API Reference list and click the **Try** button. 
+
+![Alt text](try.png "Optional title")
+
+The results of the API call appear in a pop-up:
+
+![Alt text](result.png "Optional title")

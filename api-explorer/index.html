@@ -86,20 +86,18 @@
             });
 
             function addApiKeyAuthorization() {
-                var key = encodeURIComponent($('#input_apiKey')[0].value);
+                var key = $('#input_apiKey')[0].value;
                 if (key && key.trim() != "") {
-                    var apiKeyAuth = new SwaggerClient.ApiKeyAuthorization("Authorization", "Bearer " + key, "header");
+                    // If key doesn't contain "Bearer" preamble, prepend it:
+                    if(!key.startsWith("Bearer")) {
+                        key = "Bearer " + key;
+                    }
+                    var apiKeyAuth = new SwaggerClient.ApiKeyAuthorization("Authorization", key, "header");
                     window.swaggerUi.api.clientAuthorizations.add("authorization", apiKeyAuth);
-                    log("added key " + key);
                 }
             }
 
             $('#input_apiKey').change(addApiKeyAuthorization);
-            // if you have an apiKey you would like to pre-populate on the page for demonstration purposes...
-            /*
-             var apiKey = "myApiKeyXXXX123456789";
-             $('#input_apiKey').val(apiKey);
-             */
 
             window.swaggerUi.load();
 
