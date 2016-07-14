@@ -20,7 +20,7 @@ Due to cross-domain restrictions in web browsers, you must run API Explorer on a
         
 8. Open [http://localhost:9000](http://localhost:9000) to view the API Explorer.
 
-![Alt text](explorer.png "Optional title")
+![Alt text](images/explorer.png "Optional title")
    
 ## Providing your API token {#token}
 
@@ -42,7 +42,7 @@ To make API calls you need to provide the API Explorer with your API token. An e
 3. Copy the value of the API token for your cluster, with or without the "Bearer " preamble.  
 4. In Apcera API Explorer, paste the token into the **API Token** field and click the arrow. 
 
-    ![Alt text](addtoken.png "API token")
+    ![Alt text](images/addtoken.png "API token")
    
 You're now ready to make [API calls](#apicalls).
 
@@ -50,19 +50,19 @@ You're now ready to make [API calls](#apicalls).
 
 To make an API call, locate the API you want to invoke in the API Reference list and click the **Try** button. 
 
-![Alt text](try.png "Optional title")
+![Alt text](images/try.png "Optional title")
 
 The results of the API call appear in a pop-up:
 
-![Alt text](result.png "Optional title")
+![Alt text](images/result.png "Optional title")
 
 The **Parameters** section lists the parameters supported by each endpoint, with required parameters labeled as such.
 
-![Alt text](overview.png "Optional title")
+![Alt text](images/overview.png "Optional title")
 
 To the right of each API endpoint are collapsible sections that display that API's response schema and a sample JSON response. For `PUT`/`POST` methods that take a JSON object in the request body, the request object schema and a sample JSON request object are also displayed.
 
-![Alt text](example.png "Optional title")
+![Alt text](images/example.png "Optional title")
 
 ## Troubleshooting
 
