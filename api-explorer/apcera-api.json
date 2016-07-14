@@ -1,0 +1,4444 @@
+{
+    "basePath": "/v1",
+    "definitions": {
+        "APCVersionObject": {
+            "properties": {
+                "version": {
+                    "description": "Current version of APC.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "APIError": {
+            "properties": {
+                "client_side": {
+                    "description": "If `true`, the error was due to a client-side error (e.g., invalid data); otherwise, the error was due to a server-side error (e.g. a NATS timeout).",
+                    "type": "boolean"
+                },
+                "code": {
+                    "description": "HTTP status code returned to the user.",
+                    "type": "integer"
+                },
+                "duplicate_key": {
+                    "description": "If `true`, the resource that's being sought already exists.",
+                    "type": "boolean"
+                },
+                "fatal": {
+                    "description": "If `true`, the action was fatal and should not be retried.",
+                    "type": "boolean"
+                },
+                "message": {
+                    "description": "Error message string.",
+                    "type": "string"
+                },
+                "missing_claims": {
+                    "description": "A list of missing policy claim(s) on policy denials.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "policy_error": {
+                    "$ref": "#/definitions/PolicyError"
+                },
+                "request_id": {
+                    "description": "ID of the NATS message or HTTP request that generated the error.",
+                    "type": "string"
+                },
+                "request_invalid": {
+                    "description": "If `true`, the request cannot be processed due to a conflict.",
+                    "type": "boolean"
+                },
+                "requires_restart": {
+                    "description": "If `true`, the targeted resource is in a state where the request cannot be fulfilled; for instance, a job in the `started` state may not have its resources changed.",
+                    "type": "boolean"
+                },
+                "resource_missing": {
+                    "description": "If `true`, the requested resource could not be located.",
+                    "type": "boolean"
+                },
+                "retry": {
+                    "description": "If `true`, the problem encountered was transient, and the same payload can be delivered again.",
+                    "type": "boolean"
+                },
+                "token_invalid": {
+                    "description": "If `true`, the requestor's token was invalid (e.g., due to a timeout.)",
+                    "type": "boolean"
+                },
+                "try_again_in_ms": {
+                    "description": "Specifies the amount of time in milliseconds that the client should wait before retrying the request.",
+                    "type": "integer"
+                }
+            }
+        },
+        "AuditLogItem": {
+            "properties": {
+                "event_type": {
+                    "description": "Event type.",
+                    "type": "string"
+                },
+                "event_type_int": {
+                    "description": "Integer used as the index of an enumeration of human-readable event types (see `event_type`).",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "fqn": {
+                    "description": "Fully-qualified name of the resource on which the auditable action was attempted.",
+                    "type": "string"
+                },
+                "localname": {
+                    "description": "Local name of the resource on which the auditable action was attempted.",
+                    "type": "string"
+                },
+                "namespace": {
+                    "description": "Namespace of the resource on which the auditable action was attempted.",
+                    "type": "string"
+                },
+                "on_behalf_of": {
+                    "description": "Username on whose behalf the auditable action was attempted by `principal_name`.",
+                    "type": "string"
+                },
+                "payload": {
+                    "description": "Simple structured auditing data like JSON output.",
+                    "type": "string"
+                },
+                "principal_name": {
+                    "description": "The actor (API Server or Health Manager, for example) or user that attempted the auditable action.",
+                    "type": "string"
+                },
+                "resource_type": {
+                    "description": "The resource type on which the auditable action was attempted.",
+                    "type": "string"
+                },
+                "timestamp": {
+                    "description": "UNIX timestamp that indicates when the event occurred.",
+                    "format": "float",
+                    "type": "number"
+                },
+                "uuid": {
+                    "description": "Unique identifier for the audit log entry.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "AuditLogItemOld": {
+            "properties": {
+                "action": {
+                    "description": "URL endpoint of action.",
+                    "type": "string"
+                },
+                "allowed": {
+                    "description": "Indicates if action was allowed (true) or not (false).",
+                    "type": "boolean"
+                },
+                "method": {
+                    "description": "HTTP method.",
+                    "type": "string"
+                },
+                "requester_addr": {
+                    "description": "IP address of client that made request.",
+                    "type": "string"
+                },
+                "resp_msg": {
+                    "description": "Response message, if any.",
+                    "type": "string"
+                },
+                "response_time": {
+                    "description": "Time it took to respond to the request in milliseconds.",
+                    "type": "integer"
+                },
+                "t": {
+                    "description": "Date-time stamp of request.",
+                    "format": "date-time",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "Binding": {
+            "properties": {
+                "env_var": {
+                    "description": "List of environment variables generated for the binding.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "fqn": {
+                    "description": "The binding's fully-qualified name.",
+                    "type": "string"
+                },
+                "job_fqn": {
+                    "description": "Fully-qualified name of the job that is bound to another job or service.",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "The base name of the binding.",
+                    "type": "string"
+                },
+                "parameters": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "A map of custom binding parameter names to their values.",
+                    "type": "object"
+                },
+                "provider_fqn": {
+                    "description": "Fully-qualified name of the provider used to create the service to which the source job is bound. Only relevant for job-to-service bindings.",
+                    "type": "string"
+                },
+                "service_fqn": {
+                    "description": "Fully-qualified name of a the service to which the source job is bound. Only relevant for for job-to-service bindings.",
+                    "type": "string"
+                },
+                "target_job_bound_ip": {
+                    "description": "IP address where the connection to the target job should be exposed.",
+                    "type": "string"
+                },
+                "target_job_bound_port": {
+                    "description": "Port that the target job should be exposed at.",
+                    "type": "string"
+                },
+                "target_job_fqn": {
+                    "description": "Fully-qualified name of the job to which the source job wants to bind (input only).",
+                    "type": "string"
+                },
+                "target_job_port": {
+                    "description": "Port on the target job that the source job wants to bind to.",
+                    "type": "string"
+                },
+                "target_job_uuid": {
+                    "description": "UUID of the job to which the source job is bound (output only).",
+                    "type": "string"
+                },
+                "uuid": {
+                    "description": "The binding's unique identifier.",
+                    "type": "string"
+                }
+            }
+        },
+        "CreateDockerJobRequest": {
+            "properties": {
+                "allow_egress": {
+                    "description": "If `true`, the job is allowed outbound network connectivity.",
+                    "type": "boolean"
+                },
+                "env": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "List of environment variables that are added to the job.",
+                    "type": "object"
+                },
+                "exposed_ports": {
+                    "description": "An array of ports exposed on job instances.",
+                    "items": {
+                        "description": "The numerical port exposed for connectivity.",
+                        "format": "int32",
+                        "type": "integer"
+                    },
+                    "type": "array"
+                },
+                "group": {
+                    "description": "Group to run Docker image as (default: picked by Apcera).",
+                    "type": "string"
+                },
+                "hard_scheduling_tags": {
+                    "additionalProperties": {
+                        "type": "boolean"
+                    },
+                    "description": "List of hard scheduling tags. See [Hard Tags](http://enterprise-docs.apcera.com/other/job-scheduling/#hard-tags) for more information.",
+                    "type": "object"
+                },
+                "ignore_volumes": {
+                    "description": "If `true`, volumes specified in the Docker image spec are ignored and no data will be persisted. If `false` or not specified, and the Docker image specifies volumes, then you must supply a provider FQN in the request object's `volume_provider_fqn` property.",
+                    "type": "boolean"
+                },
+                "image_url": {
+                    "description": "Docker image URL.",
+                    "type": "string"
+                },
+                "interactive": {
+                    "description": "If `true`, the start command is removed from the job definition. The start command string is saved to the `DOCKER_START_COMMAND` environment variable on the job's environment.",
+                    "type": "boolean"
+                },
+                "job_fqn": {
+                    "description": "The fully-qualified name of the job to create from the Docker image.",
+                    "type": "string"
+                },
+                "resources": {
+                    "$ref": "#/definitions/Resource",
+                    "description": "A list of compute and network resources that the job can consume."
+                },
+                "restart": {
+                    "$ref": "#/definitions/RestartConfig",
+                    "description": "Configuration related to restarting the job."
+                },
+                "routes": {
+                    "additionalProperties": {
+                        "format": "int32",
+                        "type": "integer"
+                    },
+                    "description": "A map of routes to the ports where the routes are available.",
+                    "type": "object"
+                },
+                "soft_scheduling_tags": {
+                    "additionalProperties": {
+                        "type": "boolean"
+                    },
+                    "description": "List of soft scheduling tags. See [Soft Tags](http://enterprise-docs.apcera.com/other/job-scheduling/#soft-tags) for more information.",
+                    "type": "object"
+                },
+                "start": {
+                    "description": "If `true` the job is started after its created. Default is `false`.",
+                    "type": "boolean"
+                },
+                "start_command": {
+                    "description": "The command used to start the process, specified as an array. The first element in the array is the command/binary to execute, and subsequent array elements are command arguments. The expanded command string is passed directly to `exec()` without shell or template interpretation.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "stop_command": {
+                    "description": "The command used to stop the process, specified as an array. The first element in the array is the command/binary to execute, and subsequent array elements are command arguments. The expanded command string is passed directly to `exec()` without shell or template interpretation.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "user": {
+                    "description": "User to run Docker image as. Defaults to user in the Docker image configuration, or 'root' if image doesn't have a user configured.",
+                    "type": "string"
+                },
+                "volume_provider_fqn": {
+                    "description": "Volume provider's fully-qualified name. Required if `ignore_volumes` is not set to `true`.",
+                    "type": "string"
+                },
+                "volumes": {
+                    "description": "A list of volumes used by the Docker image for persistence.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "CreateDockerJobResponse": {
+            "properties": {
+                "location": {
+                    "description": "The location of the Task created for the Docker job creation request. A client can use the location to opt-in to subscribing to the task endpoint.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "Dependency": {
+            "properties": {
+                "name": {
+                    "description": "A string that describes the resource that can be depended on (e.g., 'java', 'apache-2.2').",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "The type of dependency. Valid values are `file`, `package`, `runtime`, and `os`.",
+                    "enum": [
+                        "file",
+                        "package",
+                        "runtime",
+                        "os"
+                    ],
+                    "type": "string"
+                }
+            }
+        },
+        "DependencyResolve": {
+            "properties": {
+                "name": {
+                    "description": "Name of the resource that can be depended upon.",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "Dependency type. Can be one of the following values: \n * `file` \n  * `package` \n * `runtime` \n `os`.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "DockerOrigin": {
+            "properties": {
+                "ImageName": {
+                    "description": "Name of Docker image used to create the job.",
+                    "type": "string"
+                },
+                "ImageTag": {
+                    "description": "Tag assigned to the Docker image used to create the job.",
+                    "type": "string"
+                },
+                "RegistryURL": {
+                    "description": "URL of private Docker registry used to create the job. Empty for if the Docker public registry (a.k.a. DockerHub) was used.",
+                    "type": "string"
+                },
+                "Volumes": {
+                    "description": "Volumes defined by the Docker image used to create the job.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            }
+        },
+        "Drain": {
+            "properties": {
+                "conf": {
+                    "$ref": "#/definitions/DrainConfig",
+                    "description": "Drain configuration object."
+                },
+                "max_size": {
+                    "description": "Maximum bytes per log line to send. Defaults to 2048 bytes.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "url": {
+                    "description": "A syslog URL in the form of syslog://hostname:port.",
+                    "type": "string"
+                },
+                "uuid": {
+                    "description": "UUID of the drain object.",
+                    "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                    "type": "string"
+                }
+            }
+        },
+        "DrainConfig": {
+            "properties": {
+                "priority": {
+                    "description": "The configured syslog priority.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "protocol": {
+                    "description": "The default syslog protocol to dial over. Defaults to TCP.",
+                    "enum": [
+                        "udp",
+                        "tcp"
+                    ],
+                    "type": "string"
+                }
+            }
+        },
+        "FileListing": {
+            "properties": {
+                "name": {
+                    "description": "Name of the file or directory in the target path. Directory names are suffixed by a trailing forward slash (for example, `/app`).",
+                    "type": "string"
+                },
+                "size": {
+                    "description": "Size of the file resource; not calculated for directories.",
+                    "format": "float",
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        },
+        "Info": {
+            "properties": {
+                "cluster_domain": {
+                    "description": "Cluster domain.",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "API server name. Currently contains \"Continuum\".",
+                    "type": "string"
+                },
+                "url": {
+                    "description": "URL of Apcera API Server (for example, api.try.apcera.net).",
+                    "type": "string"
+                }
+            }
+        },
+        "InstanceManager": {
+            "properties": {
+                "ResourcesProvisioned": {
+                    "$ref": "#/definitions/Resource"
+                },
+                "ResourcesTotal": {
+                    "$ref": "#/definitions/Resource"
+                },
+                "datacenter": {
+                    "description": "",
+                    "type": "string"
+                },
+                "hostname": {
+                    "description": "Instance manager's host name.",
+                    "type": "string"
+                },
+                "num_instances": {
+                    "description": "The number of instances being managed by the instance manager.",
+                    "type": "integer"
+                },
+                "start_time": {
+                    "description": "Date and time that instance manager was started.",
+                    "type": "string"
+                },
+                "system_tags": {
+                    "description": "System tags assigned to the instance manager.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "tags": {
+                    "description": "Tags assigned to the instance manager.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "uuid": {
+                    "description": "Instance manager's unique identifier.",
+                    "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                    "type": "string"
+                }
+            }
+        },
+        "InstanceState": {
+            "properties": {
+                "FIRST_RUNNING": {
+                    "description": "Number of instances where the job was started and is about to move into the `RUNNING` state.",
+                    "type": "integer"
+                },
+                "NEW": {
+                    "description": "Number of instances in the `NEW` state.",
+                    "type": "integer"
+                },
+                "REMOVED": {
+                    "description": "Number of instances that are no longer consuming resources and have no remaining configuration on the system.",
+                    "type": "integer"
+                },
+                "RUNNING": {
+                    "description": "Number of instances that are running.",
+                    "type": "integer"
+                },
+                "SETUP": {
+                    "description": "Number of instances in which packages are being installed, networking initialized, etc.",
+                    "type": "integer"
+                },
+                "STARTING": {
+                    "description": "Number of instances whose processes have been started, but have not been verified to be running.",
+                    "type": "integer"
+                },
+                "STARTING_WAIT": {
+                    "description": "Number of instances that are waiting for dependent jobs to become ready.",
+                    "type": "integer"
+                },
+                "STOPPING": {
+                    "description": "Number of instances that are in the process of having their processes shutdown.",
+                    "type": "integer"
+                },
+                "STOPPING_WAIT": {
+                    "description": "Number of instances that are being stopped, but have jobs depending on it. In this case the other jobs must first transition past the `STOPPING` state before this instance can be stopped.",
+                    "type": "integer"
+                },
+                "TEARDOWN": {
+                    "description": "Number of instances whose user-defined processes have been killed, and the instance is being removed from cluster resources.",
+                    "type": "integer"
+                },
+                "UPDATING": {
+                    "description": "Number of instances that are in a state that allows the instance to update various properties of the container.",
+                    "type": "integer"
+                }
+            },
+            "type": "object"
+        },
+        "Instances": {
+            "properties": {
+                "announced_routes": {
+                    "description": "Indicates whether the routes for this instance have been announced.",
+                    "type": "boolean"
+                },
+                "created_time": {
+                    "description": "UNIX timestamp for when instance was created.",
+                    "format": "float",
+                    "type": "number"
+                },
+                "exit_code": {
+                    "description": "Exit code of the main processes; should only be checked if `exited` is `true`.",
+                    "type": "integer"
+                },
+                "exited": {
+                    "description": "Set to true if the instance started and its main process managed to exit.",
+                    "type": "boolean"
+                },
+                "failed": {
+                    "description": "Set to `true` if the instance has failed in some way.",
+                    "type": "boolean"
+                },
+                "host": {
+                    "description": "Name of the host the instance is running on.",
+                    "type": "string"
+                },
+                "instance_manager": {
+                    "description": "UUID of the instance manager running the instance.",
+                    "type": "string"
+                },
+                "job_version_id": {
+                    "description": "The sequence number of the job the instance is running.",
+                    "format": "int64",
+                    "type": "integer"
+                },
+                "state": {
+                    "$ref": "#/definitions/InstanceState",
+                    "description": "State of the instance."
+                },
+                "uuid": {
+                    "description": "The instance's unique identifier.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "Job": {
+            "properties": {
+                "bindings": {
+                    "additionalProperties": {
+                        "$ref": "#/definitions/Binding"
+                    },
+                    "description": "A list of service bindings associated with the job.",
+                    "type": "object"
+                },
+                "created_at": {
+                    "description": "Time at which the job was created.",
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "created_by": {
+                    "description": "The principal name of user who created the job.",
+                    "type": "string"
+                },
+                "docker_origin": {
+                    "$ref": "#/definitions/DockerOrigin",
+                    "description": "For jobs that run Docker images, specifies the Docker registry, image name and tag that were used to create the job. This field can't be changed after the job is created."
+                },
+                "fqn": {
+                    "description": "Job's fully-qualified name.",
+                    "type": "string"
+                },
+                "hard_scheduling_tags": {
+                    "additionalProperties": {
+                        "type": "boolean"
+                    },
+                    "description": "List of hard scheduling tags. See [Hard Tags](http://enterprise-docs.apcera.com/other/job-scheduling/#hard-tags) for more information.",
+                    "type": "object"
+                },
+                "health": {
+                    "$ref": "#/definitions/JobHealth",
+                    "description": "Indicates the health of the job. If empty then the job's health has not been retrieved from the health manager yet."
+                },
+                "logs": {
+                    "description": "An array of logs the job will be producing that should be collected for aggregation or streaming.",
+                    "items": {
+                        "$ref": "#/definitions/Log"
+                    },
+                    "type": "array"
+                },
+                "name": {
+                    "description": "Name of the job.",
+                    "type": "string"
+                },
+                "network_ref": {
+                    "description": "An object that contains information about the [virtual network](#virtualnetwork) the job belongs to.",
+                    "$ref": "#/definitions/JobNetworkReference"
+                },
+                "num_instances": {
+                    "description": "The number of job instances currently running.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "packages": {
+                    "description": "Array of packages for this Job. Includes both user-specified packages and the packages calculated by the package manager.",
+                    "items": {
+                        "$ref": "#/definitions/PackageInfo"
+                    },
+                    "type": "array"
+                },
+                "ports": {
+                    "description": "An array of ports associated with the job.",
+                    "items": {
+                        "$ref": "#/definitions/Port"
+                    },
+                    "type": "array"
+                },
+                "processes": {
+                    "additionalProperties": {
+                        "$ref": "#/definitions/Process"
+                    },
+                    "description": "A list of processes associated with the job.",
+                    "type": "object"
+                },
+                "resources": {
+                    "$ref": "#/definitions/Resource",
+                    "description": "A list of compute and network resources that this job can consume."
+                },
+                "restart": {
+                    "$ref": "#/definitions/RestartConfig",
+                    "description": "Configuration related to restarting the job."
+                },
+                "rollout": {
+                    "$ref": "#/definitions/RolloutConfig",
+                    "description": "Configuration related to rolling updates of the job."
+                },
+                "soft_scheduling_tags": {
+                    "additionalProperties": {
+                        "type": "boolean"
+                    },
+                    "description": "List of soft scheduling tags. See [Soft Tags](http://enterprise-docs.apcera.com/other/job-scheduling/#soft-tags) for more information.",
+                    "type": "object"
+                },
+                "state": {
+                    "description": "General state of this Job in the system.",
+                    "enum": [
+                        "invalid",
+                        "unknown",
+                        "created",
+                        "errored",
+                        "staging",
+                        "staging_failed",
+                        "ready",
+                        "started",
+                        "stopped",
+                        "finished"
+                    ],
+                    "type": "string"
+                },
+                "tags": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Map of tags (arbitrary strings) to values.",
+                    "type": "object"
+                },
+                "updated_at": {
+                    "description": "Time at which the job was most recently updated.",
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "updated_by": {
+                    "description": "The principal name of the last user to update the job.",
+                    "type": "string"
+                },
+                "uuid": {
+                    "description": "The job's unique identifier.",
+                    "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                    "type": "string"
+                },
+                "version_id": {
+                    "description": "An auto-incremented number that indicates the revision of the object.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "weight": {
+                    "description": "A job's weight is used to route requests to this job relative to other job that have the same routes. See [Sharing Routes and Route Weights](http://docs.apcera.com/jobs/routes/#about-route-weights).",
+                    "format": "int32",
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "fqn"
+            ],
+            "type": "object"
+        },
+        "JobHealth": {
+            "properties": {
+                "flapping": {
+                    "description": "Indicates if job is in a flapping state (true) or not (false).",
+                    "type": "boolean"
+                },
+                "instance_state_count": {
+                    "additionalProperties": {
+                        "$ref": "#/definitions/InstanceState"
+                    },
+                    "description": "Map of instance states to the number of instances in that state, as reported by the health manager.",
+                    "type": "object"
+                },
+                "score": {
+                    "description": "Score is the ratio of running instances to configured instances, capped between 0 and 1.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "uuid": {
+                    "description": "UUID of the job.",
+                    "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                    "type": "boolean"
+                }
+            }
+        },
+        "JobNetworkReference": {
+            "properties": {
+                "uuid": {
+                    "type": "string",
+                    "description": "UUID of the virtual network the job belongs to."
+                }
+            }
+        },
+        "Log": {
+            "properties": {
+                "channel": {
+                    "description": "The name of the channel that the log should be published on.",
+                    "type": "string"
+                },
+                "file": {
+                    "description": "The path to the log file within the job's container that should be collected.",
+                    "type": "string"
+                },
+                "jobid": {
+                    "description": "UUID of the job generating the log.",
+                    "type": "string"
+                }
+            }
+        },
+        "MetricSeries": {
+            "properties": {
+                "times": {
+                    "description": "times",
+                    "items": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "type": "array"
+                },
+                "values": {
+                    "description": "times",
+                    "items": {
+                        "format": "float",
+                        "type": "integer"
+                    },
+                    "type": "array"
+                }
+            }
+        },
+        "MetricSeriesHash": {
+            "additionalProperties": {
+                "$ref": "#/definitions/MetricSeries"
+            },
+            "type": "object"
+        },
+        "Metrics": {
+            "properties": {
+                "errors": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "A hash list of errors",
+                    "type": "object"
+                },
+                "metrics": {
+                    "additionalProperties": {
+                        "$ref": "#/definitions/MetricSeriesHash"
+                    },
+                    "type": "object"
+                }
+            }
+        },
+        "Namespace": {
+            "properties": {
+                "namespace": {
+                    "description": "Default namespace.",
+                    "type": "string"
+                }
+            }
+        },
+        "Package": {
+            "properties": {
+                "created_at": {
+                    "description": "The date and time when the package was created.",
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "created_by": {
+                    "description": "Principal name of the user who created the package.",
+                    "type": "string"
+                },
+                "dependencies": {
+                    "description": "List of dependencies that the package has in order to be used. A dependency expresses a requirement that a package has on an other package.",
+                    "items": {
+                        "$ref": "#/definitions/Dependency"
+                    },
+                    "type": "array"
+                },
+                "environment": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "List of environment variables that are added to any process that uses the package.",
+                    "type": "object"
+                },
+                "error_message": {
+                    "description": "Error encountered during an asynchronous operation on the package. An example is a failure encountered during instance snapshot; the ErrorMessage field on the created snapshot package would contain more information.",
+                    "type": "string"
+                },
+                "fqn": {
+                    "description": "Package's fully-qualified name.",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Package name.",
+                    "type": "string"
+                },
+                "provides": {
+                    "description": "List of 'provides' that the package provides for other packages to use. A 'provide' expresses a named resource that other packages or jobs can add as a dependency.",
+                    "items": {
+                        "$ref": "#/definitions/Provide"
+                    },
+                    "type": "array"
+                },
+                "resource": {
+                    "$ref": "#/definitions/PackageResource",
+                    "description": "Deprecated. Use `resources`. An object that describes the package's associated binary resource. "
+                },
+                "resources": {
+                    "description": "An list of objects that describes the package's associated binary resources.",
+                    "items": {
+                        "$ref": "#/definitions/PackageResource"
+                    },
+                    "type": "array"
+                },
+                "staging_pipeline": {
+                    "description": "The UUID of the staging pipeline used to stage this package into a runnable state.",
+                    "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                    "type": "string"
+                },
+                "staging_pipeline_fqn": {
+                    "description": "The fully-qualified name of the staging pipeline used to stage the package.",
+                    "type": "string"
+                },
+                "state": {
+                    "description": "Package state. Possible values are `uploading`, 'staging`, `failed`, `ready`, `deleted`, and `unknown`.",
+                    "type": "string"
+                },
+                "tags": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Map of tags by tag name.",
+                    "type": "object"
+                },
+                "updated_at": {
+                    "description": "The date and time when the package was most recently updated.",
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "updated_by": {
+                    "description": "Principal name of the last user to update the package.",
+                    "type": "string"
+                },
+                "uuid": {
+                    "description": "The package's unique identifier.",
+                    "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                    "type": "string"
+                },
+                "version_id": {
+                    "description": "Package's auto-incremented version number.",
+                    "format": "int64",
+                    "type": "integer"
+                }
+            }
+        },
+        "PackageDependsRequest": {
+            "properties": {
+                "dependencies": {
+                    "items": {
+                        "$ref": "#/definitions/DependencyResolve"
+                    },
+                    "type": "array"
+                },
+                "job_target": {
+                    "description": "Namespace in which dependencies will be resolved (e.g. the namespace of a job that is being staged, the namespace of the user requesting the resolution).",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "PackageInfo": {
+            "properties": {
+                "source": {
+                    "description": "The source of the package, whether it was provided by the user or calculated by the Package Manager.",
+                    "enum": [
+                        "user",
+                        "system"
+                    ],
+                    "type": "string"
+                },
+                "state": {
+                    "description": "Represents the availability of the package.",
+                    "enum": [
+                        "unknown",
+                        "uploading",
+                        "staging",
+                        "failed",
+                        "ready",
+                        "deleted"
+                    ],
+                    "type": "string"
+                },
+                "uuid": {
+                    "description": "UUID of the package.",
+                    "type": "string"
+                }
+            }
+        },
+        "PackageResource": {
+            "properties": {
+                "digest": {
+                    "description": "A hash of the binary resource prefixed by its algorithm (e.g. 'sha1:abcd...').",
+                    "type": "string"
+                },
+                "length": {
+                    "description": "The length of the binary resource in bytes.",
+                    "type": "integer"
+                },
+                "sha1": {
+                    "description": "A hash of the binary resource.",
+                    "type": "string"
+                },
+                "uuid": {
+                    "description": "The package resource's unique identifier.",
+                    "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                    "type": "string"
+                }
+            }
+        },
+        "PolicyError": {
+            "properties": {
+                "errors": {
+                    "description": "An array of specific policy errors that occurred.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "job": {
+                    "$ref": "#/definitions/Job",
+                    "description": "A reference to the job associated with the policy error."
+                },
+                "job_changed": {
+                    "description": "If `true`, the policy error was the result of changes to a job.",
+                    "type": "boolean"
+                },
+                "repairable": {
+                    "description": "If `true`, the error is repairable.",
+                    "type": "boolean"
+                }
+            }
+        },
+        "Port": {
+            "properties": {
+                "number": {
+                    "description": "The numerical port exposed for connectivity.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "optional": {
+                    "description": "A value of `true` indicates that the instance manager (IM) should attempt to verify that connectivity has been established for this port; if `false`, no such verification occurs.",
+                    "type": "boolean"
+                },
+                "routes": {
+                    "description": "An array of URLs to map to the port.",
+                    "items": {
+                        "$ref": "#/definitions/Route"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "Process": {
+            "properties": {
+				"app": {
+                    "$ref": "#/definitions/ProcessObject"
+				}
+			}
+		},
+        "ProcessObject": {
+            "properties": {
+                "environment": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "An optional list of environment values to attach to the process within the job.",
+                    "type": "object"
+                },
+                "group": {
+                    "description": "Name of the group used to run the process within a container. An empty string lets the the instance manager choose a group.",
+                    "type": "string"
+                },
+                "heavy": {
+                    "description": "Start the process in \"heavy\" mode: giving it pid 1.  Only one process within the job can set this flag to true.",
+                    "type": "boolean"
+                },
+                "start_command": {
+                    "description": "The command used to start the process within the container's isolation context.",
+                    "type": "string"
+                },
+                "start_command_raw": {
+                    "description": "The command used to start the process, specified as an array. The first element in the array is the command/binary to execute, and subsequent array elements are command arguments. The expanded command string is passed directly to `exec()` without shell or template interpretation.  If `start_command_raw` is provided then `start_command`, if specified, is ignored. This property is typically used with exact processes that have an extremely well-known start command. ",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "start_command_timeout": {
+                    "description": "The number of seconds that the system will wait for startup to complete. This includes the time that it will take for ports to become available.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "stop_command": {
+                    "description": "The command used to stop the process within the container's isolation context. If not defined, OS-level signals (like `TERM`) may be used to shut down the process.",
+                    "type": "string"
+                },
+                "stop_command_raw": {
+                    "description": "The command used to stop the process, specified as an array. The first element in the array is the command/binary to execute, and subsequent array elements are command arguments. The expanded command string is passed directly to `exec()` without shell or template interpretation.  If `stop_command_raw` is provided then `stop_command`, if specified, is ignored. This property is typically used with exact processes that have an extremely well-known start command. ",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "stop_timeout": {
+                    "description": "The number of seconds to give the process after `stop_command` has been run before forcing the command to shutdown via OS-level signals, such as `TERM`. If no `stop_command` is provided for the process, OS-level signals (like `TERM`) may be used to terminate the process.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "user": {
+                    "description": "Name of the user used to run the process within a container. An empty string lets the the instance manager choose a user.",
+                    "type": "string"
+                }
+            }
+        },
+        "Provide": {
+            "properties": {
+                "name": {
+                    "description": "A string that describes the resource that can be provided (e.g., 'java', 'apache-2.2').",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "The type of provide. Possible values are `file`, `package`, `runtime`, and `os`.",
+                    "enum": [
+                        "file",
+                        "package",
+                        "runtime",
+                        "os"
+                    ],
+                    "type": "string"
+                }
+            }
+        },
+        "Provider": {
+            "properties": {
+                "backing_job_fqn": {
+                    "description": "Backing job's FQN.",
+                    "type": "string"
+                },
+                "backing_job_port": {
+                    "description": "Backing job's port.",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "Provider description.",
+                    "type": "string"
+                },
+                "fqn": {
+                    "description": "Provider FQN (Fully Qualified Name).",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Provider name.",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "Provider type (e.g. mysql, posgres).",
+                    "type": "string"
+                },
+                "uuid": {
+                    "description": "Provider UUID.",
+                    "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "Resource": {
+            "properties": {
+                "cpu": {
+                    "description": "Milliseconds of CPU time per second of physical time allocated to the job. May be greater than 1000ms/second in cases where time is across multiple cores.",
+                    "format": "int64",
+                    "type": "integer"
+                },
+                "disk": {
+                    "description": "Amount of disk space allocated to the job, in MB.",
+                    "format": "int64",
+                    "type": "integer"
+                },
+                "memory": {
+                    "description": "Memory allocated to job, in MB.",
+                    "format": "int64",
+                    "type": "integer"
+                },
+                "netmax": {
+                    "description": "Maximum amount of network throughput (ceiling) allowed, in Mbps.",
+                    "format": "int64",
+                    "type": "integer"
+                },
+                "network": {
+                    "description": "Amount of network throughput (floor) allocated to the job, in Mbps.",
+                    "format": "int64",
+                    "type": "integer"
+                }
+            }
+        },
+        "RestartConfig": {
+            "properties": {
+                "maximum_attempts": {
+                    "description": "The maximum number of restart attempts per instance, applies to `always` and `failure` restart modes. If set to 0 restarts are not limited.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "restart_mode": {
+                    "description": "The restart mode to use. Valid values are `always` (always restart), `no` (never restart), and `failure` (only restart on application failure).",
+                    "enum": [
+                        "always",
+                        "no",
+                        "failure"
+                    ],
+                    "type": "string"
+                }
+            }
+        },
+        "RolloutConfig": {
+            "properties": {
+                "errored_state_window": {
+                    "description": "The number of seconds a job should be cycling between flapping states before being considered in an errored state and stop attempting any restarts.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "flapping_minimum_restarts": {
+                    "description": "The minimum number of tasks that must have failed in order to trigger a flapping state.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "flapping_percent": {
+                    "description": "The number of instances that must have restarted in a given window for flapping to kick in.",
+                    "format": "float",
+                    "type": "number"
+                },
+                "flapping_window": {
+                    "description": "The number of seconds over which the job's flapping window operates.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "force_stop_old_instances_after": {
+                    "description": "If this field is non-zero then it will be used to represent how long an old version of a job is allowed to exist in the cluster. If this is zero then no fixed length is established and updates will be applied by starting a new version and then only when that instance is running will the old instance be killed.",
+                    "format": "int32",
+                    "type": "integer"
+                }
+            }
+        },
+        "Route": {
+            "properties": {
+                "endpoint": {
+                    "description": "The URI where the traffic should being routed to. For HTTP routes, the value should contain the route's host and path; for TCP routes, the value should take the form of \"ip:port\".",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "The type of route. Valid values are `http` or `tcp`. ",
+                    "type": "string"
+                },
+                "weight": {
+                    "description": " A value between 0 and 1 that specifies the route's weight, which is used to balance incoming traffic across apps that share the route. Weights are not on a specific scale; weights of all routes for a given job are normalized.",
+                    "format": "float",
+                    "type": "number"
+                }
+            }
+        },
+        "Rule": {
+            "properties": {
+                "action": {
+                    "description": "The type of action to take when the rule is triggered. Can either by 'hook' or 'notification'.",
+                    "type": "string"
+                },
+                "created_at": {
+                    "description": "UNIX timestamp when event rule was created.",
+                    "format": "float",
+                    "type": "number"
+                },
+                "created_by": {
+                    "description": "Principal name of user who created the event rule.",
+                    "type": "string"
+                },
+                "fqn": {
+                    "description": "The rule's fully-qualified name against which policy may be enforced.",
+                    "type": "string"
+                },
+                "job": {
+                    "description": "FQN of the job to enforce the rule against.",
+                    "type": "string"
+                },
+                "provider": {
+                    "description": "FQN of the provider to enforce this rule against. In only `provider` is populated for this rule, then all semantic pipelines consuming a provider matching this FQN will have the rule enforced against them.",
+                    "type": "string"
+                },
+                "service": {
+                    "description": "FQN of the service to enforce this rule against. If only `service` is populated for this rule, then all semantic pipelines consuming a service matching this FQN will have the rule enforced against them.",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "Type depends upon specified `action` of event rule, and can specify the timing of the hook firing.",
+                    "type": "string"
+                },
+                "version_id": {
+                    "description": "Rule's auto-incremented version number.",
+                    "format": "int32",
+                    "type": "integer"
+                }
+            },
+            "type": "object"
+        },
+        "Runtime": {
+            "properties": {
+                "patterns": {
+                    "description": "An array of file names or patterns used to select the appropriate runtime.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "runtime": {
+                    "description": "Identifies the runtime (for example, \"bash\", or \"perl\").",
+                    "type": "string"
+                }
+            }
+        },
+        "Service": {
+            "properties": {
+                "uuid": {
+                    "description": "Service's unique identifer",
+                    "type": "string"
+                },
+                "fqn": {
+                    "description": "Service's fully-qualified name.",
+                    "type": "string"
+                },
+                "provider_fqn": {
+                    "description": "Fully-qualified name of provider used to create service.",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "A service type ('mysql', 'postgres', 'mongodb', etc.) that corresponds to a service gateway of that type.",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "A human-readable description of the service.",
+                    "type": "string"
+                },
+                "created_by" : {
+                    "description": "Principal name of the user who created the service.",
+                    "type": "string"
+                },
+                "created_at" : {
+                    "description": "UNIX timestamp when service was created.",
+                    "type" : "number"
+                },
+                "parameters": {
+                    "description": "A map of service parameter names to values.",
+                    "type": "object"
+                }
+            }
+        },
+        "ServiceRequestObject": {
+            "properties": {
+                "description": {
+                    "description": "A description of the service.",
+                    "type": "string"
+                },
+                "fqn": {
+                    "description": "The service's fully-qualified name.",
+                    "type": "string"
+                },
+                "provider_fqn": {
+                    "description": "The fully-qualified name of provider used to create service.",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "A service type ('mysql', 'postgres', 'mongodb', etc.) that corresponds to a service gateway of that type.",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "A human-readable description of the service.",
+                    "type": "string"
+                },
+                "parameters": {
+                    "description": "A map of service parameter names to values.",
+                    "type": "object"
+                }
+            }
+        },
+        "SemiPipeRule": {
+            "properties": {
+                "action": {
+                    "$ref": "#/definitions/SemiPipeRuleAction"
+                },
+                "created_at": {
+                    "description": "Date-time when rule was created.",
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "created_by": {
+                    "description": "User that created the rule.",
+                    "type": "string"
+                },
+                "job": {
+                    "description": "Specific job that rule applies to.",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Rule name.",
+                    "type": "string"
+                },
+                "provider": {
+                    "description": "Provider used to provision the service, if any.",
+                    "type": "string"
+                },
+                "service": {
+                    "description": "FQN of service to which the rule applies.",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "Rule type.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "uuid": {
+                    "description": "Rule's unique identifier.",
+                    "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                    "type": "string"
+                }
+            }
+        },
+        "SemiPipeRuleAction": {
+            "properties": {
+                "commands": {
+                    "description": "Commands that will trigger the hook or notification.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "uri": {
+                    "description": "URL to receive the hook or notification request. Required for notifications, but optional for hooks.",
+                    "type": "string"
+                },
+                "inline": {
+                    "description": "If no URL is given, you can specify an action directly. URL and action cannot be specified at the same time. Action can be 'allow' or 'deny'.",
+                    "type": "string"
+                }
+            }
+        },
+        "StagerJob": {
+            "properties": {
+                "uuid": {
+                    "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "StagingPipeline": {
+            "properties": {
+                "created_at": {
+                    "description": "The date and time when the staging pipeline was created.",
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "created_by": {
+                    "description": "Principal name of the user who created the staging pipeline.",
+                    "type": "string"
+                },
+                "fqn": {
+                    "description": "Staging pipeline's FQN.",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Staging pipeline's local name.",
+                    "type": "string"
+                },
+                "stagers": {
+                    "description": "The list of jobs that will be cloned in order to make the specific stager instances.",
+                    "items": {
+                        "$ref": "#/definitions/StagerJob"
+                    },
+                    "type": "array"
+                },
+                "updated_at": {
+                    "description": "The date and time when the staging pipeline was most recently updated.",
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "updated_by": {
+                    "description": "Principal name of the user who last updated the staging pipeline.",
+                    "type": "string"
+                },
+                "uuid": {
+                    "description": "Staging pipeline's unique identifier.",
+                    "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                    "type": "string"
+                },
+                "version_id": {
+                    "description": "Staging pipeline's auto-incremented version number.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "SubnetInfo": {
+            "properties": {
+                "Subnet": {
+                    "description": "The subnet assigned to a virtual network in CIDR notation (`192.168.1.0/24`, for example).",
+                    "type": "string"
+                }
+            }
+        },
+        "SubTask": {
+            "properties": {
+                "index": {
+                    "description": "The index of this subtask among all subtasks.",
+                    "type": "integer"
+                },
+                "name": {
+                    "description": "A human-readable description of this subtask.",
+                    "type": "string"
+                },
+                "progress": {
+                    "$ref": "#/definitions/TaskProgress",
+                    "description": "Indicates how far along this unit of work is."
+                },
+                "total": {
+                    "description": "The total number of subtasks in the current stage.",
+                    "type": "integer"
+                }
+            }
+        },
+        "Task": {
+            "properties": {
+                "errored": {
+                    "description": "Describes the error for a Task that has encountered an error.",
+                    "type": "string"
+                },
+                "events": {
+                    "description": "List of all TaskEvents that have been published for this particular task.",
+                    "items": {
+                        "$ref": "#/definitions/TaskEvent"
+                    },
+                    "type": "array"
+                },
+                "state": {
+                    "description": "The Task's current state. Can be `running`, `stopped` or `complete`.",
+                    "enum": [
+                        "running",
+                        "stopped",
+                        "complete"
+                    ],
+                    "type": "string"
+                },
+                "time_completed": {
+                    "description": "Indicates the time when the task completed. Stored as a UNIX timestamp with nanosecond precision.",
+                    "format": "int64",
+                    "type": "integer"
+                },
+                "time_started": {
+                    "description": "Indicates the time when the task was started. Stored as a UNIX timestamp with nanosecond precision.",
+                    "format": "int64",
+                    "type": "integer"
+                },
+                "uuid": {
+                    "description": "The task's unique identifier.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "TaskEvent": {
+            "properties": {
+                "payload": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Extra information about the TaskEvent.",
+                    "type": "object"
+                },
+                "stage": {
+                    "description": "A logical grouping of subtasks. A stage could be \"Creating Job\" or \"Downloading Packages\".",
+                    "type": "string"
+                },
+                "subtask": {
+                    "$ref": "#/definitions/SubTask",
+                    "description": "A description of the sub-task that this TaskEvent describes."
+                },
+                "tags": {
+                    "description": "An list of tags that provide a hint about what is being tracked.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "task_event_type": {
+                    "description": "The type of message this TaskEvent contains.",
+                    "enum": [
+                        "event",
+                        "error",
+                        "eos",
+                        "disconnect",
+                        "cancel"
+                    ],
+                    "type": "string"
+                },
+                "task_uuid": {
+                    "description": "UUID of the Task that stores this event.",
+                    "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                    "type": "string"
+                },
+                "thread": {
+                    "description": "Represents a logically independent procedure within a Task. For instance, a thread could be \"job1\" or \"job2\", or \"Link job1 and job2\".",
+                    "type": "string"
+                },
+                "time": {
+                    "description": "Time in UNIX nanoseconds immediately before the TaskEvent gets announced on NATS.",
+                    "format": "int64",
+                    "type": "integer"
+                },
+                "uuid": {
+                    "description": "UUID of the Task that stores this event.",
+                    "type": "string"
+                }
+            }
+        },
+        "TaskProgress": {
+            "properties": {
+            "current": {
+                "description": "Current progress.",
+                "format": "int64",
+                "type": "number"
+            },
+            "progress": {
+                "description": "Total amount of work to be done.",
+                "format": "int64",
+                "type": "number"
+	            }
+            }
+        },
+        "UnbindParameterObject": {
+            "properties": {
+                "force": {
+                    "description": "If `true`, forces the binding to be removed and ignores errors from the backing service. Can be useful if the service is no longer available or is experiencing failures.",
+                    "type": "boolean"
+                },
+                "job": {
+                    "description": "Fully-qualified name of the job to unbind from the service specified by the `service` parameter.",
+                    "pattern": "job::(/\\w+)+::\\w+(/\\w+)*",
+                    "type": "string"
+                },
+                "service": {
+                    "description": "Fully-qualified name of the service to unbind from the job specified by the `job` parameter.",
+                    "pattern": "service::(/\\w+)+::\\w+(/\\w+)*",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "UnlinkParameterObject": {
+            "properties": {
+                "from_job": {
+                    "description": "FQN of the job being linked from.",
+                    "pattern": "job::(/\\w+)+::\\w+(/\\w+)*",
+                    "type": "string"
+                },
+                "port": {
+                    "description": "The port on the target job to link to.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "to_job": {
+                    "description": "FQN of the target job.",
+                    "pattern": "job::(/\\w+)+::\\w+(/\\w+)*",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "VirtualNetwork": {
+            "properties": {
+                "fqn": {
+                    "type": "string",
+                    "description": "Network's fully-qualified name."
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Network's local name."
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Network description."
+                },
+                "uuid": {
+                    "type": "string",
+                    "description": "Network's unique ID."
+                },
+                "subnet_info": {
+                    "$ref": "#/definitions/SubnetInfo",
+                    "description": "Contains information about the network's subnet."
+                },
+                "updated_at": {
+                    "type": "number",
+                    "description": "UNIX timestamp when the network was last updated."
+                },
+                "updated_by": {
+                    "type": "string",
+                    "description": "Principal name of user who last updated the network."
+                },
+                "created_at": {
+                    "type": "number",
+                    "description": "UNIX timestamp when the network was created."
+                },
+                "created_by": {
+                    "type": "string",
+                    "description": "Principal name of user who created the network."
+                },
+                "network_end_points": {
+                    "description": "A list of network endpoints in the network.",
+                    "items": {
+                        "$ref": "#/definitions/VirtualNetworkEndpoint"
+                    },
+                    "type": "array"
+                },
+                "version_id": {
+                    "description": "Auto-incrementing version number for the network.",
+                    "type": "integer"
+                }
+            }
+        },
+        "VirtualNetworkEndpoint": {
+            "properties": {
+                "uuid": {
+                    "description": "The UUID of the network endpoint.",
+                    "type": "string"
+                },
+                "fqn": {
+                    "description": "Fully-qualified name of the job the endpoint is attached to.",
+                    "type": "string"
+                },
+                "network_fqn": {
+                    "description": "Fully-qualified name of the network that the endpoint belongs to.",
+                    "type": "string"
+                },
+                "end_point_interface": {
+                    "description": "A list of interfaces associated with the job.",
+                    "items": {
+                        "$ref": "#/definitions/VirtualNetworkEndpointInterface"
+                    },
+                    "type": "array"
+                }
+            }
+        },
+        "VirtualNetworkEndpointInterface": {
+            "properties": {
+                "uuid": {
+                    "type": "string",
+                    "description": "The UUID of the network endpoint."
+                },
+                "hardware_addr": {
+                    "type": "string",
+                    "description": "Unique identifier assigned to the network interface."
+                },
+                "ipv4_addr": {
+                    "type": "string",
+                    "description": "Virtual IP address assigned to the instance."
+                }
+            }
+        }
+    },
+    "host": "api.cosmic.apcera-platform.io",
+    "info": {
+        "description": "REST APIs used to manage an Apcera cluster and its resources. ",
+        "title": "Apcera APIs",
+        "version": "1.0.0"
+    },
+    "parameters": {
+        "authHeaderParameter": {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "type": "string"
+        }
+    },
+    "paths": {
+        "/apc/download/{platform}": {
+            "get": {
+                "description": "Downloads the APC command-line utility for the specified platform.",
+                "parameters": [
+                    {
+                        "description": "Target platform. Can be one of the following values: \n * `linux` \n * `osx` \n * `linux_amd64` \n * `osx_amd64` \n * `darwin_amd64` \n * `darwin`",
+                        "enum": [
+                            "linux_amd64",
+                            "linux",
+                            "osx_amd64",
+                            "darwin_amd64",
+                            "darwin",
+                            "osx"
+                        ],
+                        "format": "string",
+                        "in": "path",
+                        "name": "platform",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A successful response contains the APC binary for the specified platform."
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Downloads the APC utility.",
+                "tags": [
+                    "Utilities"
+                ]
+            }
+        },
+        "/apc/version": {
+            "get": {
+                "description": "Returns the version of APC available for download from the cluster.",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "$ref": "#/definitions/APCVersionObject"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Returns the version of APC available for download.",
+                "tags": [
+                    "Utilities"
+                ]
+            }
+        },
+        "/audit": {
+            "get": {
+                "description": "Returns a list audit log items. You can optionally filter the list by start time, end time, FQN, or event type.",
+                "parameters": [
+                    {
+                        "description": "UNIX timestamp. If specified, only events that occurred on or after the specified time are returned in the response.",
+                        "format": "float",
+                        "in": "query",
+                        "name": "start_time",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "description": "UNIX timestamp. If specified, only events that occurred on or before the specified time are returned in the response.",
+                        "format": "float",
+                        "in": "query",
+                        "name": "end_time",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "description": "If specified, only events on the resource specified by `fqn` are returned in the response. You can also specify an FQN segment, which may include wildcards for the resource type. For example:\n * `*::/` returns all audit logs for all resource types.\n * `job::/` returns all audit logs for Job resource types. \n * `job::/apcera` returns all audit logs for Job resource types in the `/apcera` namespace and its sub-namespaces. \n * `*::/apcera` returns all audit logs for all resource types in the `/apcera` namespace its sub-namespaces.",
+                        "in": "query",
+                        "name": "fqn",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "If specified, only events of the specified type are returned in the response.",
+                        "in": "query",
+                        "name": "event_type",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A successful response returns an array of JSON objects that describe audit items. ",
+                        "schema": {
+                            "items": {
+                                "$ref": "#/definitions/AuditLogItem"
+                            },
+                            "type": "array"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Returns audit log items for the cluster."
+            }
+        },
+        "/audit_logs": {
+            "get": {
+                "description": "Returns a list of audit log items. ",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "items": {
+                                "$ref": "#/definitions/AuditLogItemOld"
+                            },
+                            "type": "array"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Returns audit log items for the cluster.",
+                "tags": [
+                    "Logs"
+                ]
+            }
+        },
+        "/bindings": {
+            "post": {
+                "parameters": [
+                    {
+                        "description": "An object that defines the properties of the new binding.",
+                        "in": "body",
+                        "name": "binding",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Binding"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response returns the new binding object.",
+                        "schema": {
+                            "$ref": "#/definitions/Binding"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Creates a new binding between a job and a service, or between two jobs (a job link).",
+                "tags": [
+                    "Jobs",
+                    "Services and Bindings"
+                ]
+            }
+        },
+        "/info": {
+            "get": {
+                "description": "Returns information about the API server.",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "$ref": "#/definitions/Info"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Returns information about the API server.",
+                "tags": [
+                    "Utilities"
+                ]
+            }
+        },
+        "/instance_managers": {
+            "get": {
+                "description": "Returns a list of instance managers.",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "items": {
+                                "$ref": "#/definitions/InstanceManager"
+                            },
+                            "type": "array"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Returns a list of instance managers.",
+                "tags": [
+                    "Instances"
+                ]
+            }
+        },
+        "/instance_managers/{uuid}": {
+            "get": {
+                "description": "Returns details for the specified instance manager.",
+                "parameters": [
+                    {
+                        "description": "UUID of the instance manager to retrieve details for.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "$ref": "#/definitions/InstanceManager"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Returns details for the specified instance manager.",
+                "tags": [
+                    "Instances"
+                ]
+            }
+        },
+        "/instance_managers/{uuid}/instances": {
+            "get": {
+                "description": "Returns a list of instances managed by the specified instance manager.",
+                "parameters": [
+                    {
+                        "description": "UUID of the instance manager whose instances should be retrieved.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "items": {
+                                "$ref": "#/definitions/Instances"
+                            },
+                            "type": "array"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Returns a list of instances managed by the specified instance manager.",
+                "tags": [
+                    "Instances"
+                ]
+            }
+        },
+        "/jobs": {
+            "get": {
+                "description": "Returns a list of jobs, optionally filtered by one or more query parameters.",
+                "operationId": "jobsGet",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    },
+                    {
+                        "description": "List of tags. Only jobs with the specified tags are returned.",
+                        "in": "query",
+                        "items": {
+                            "type": "string"
+                        },
+                        "name": "tag",
+                        "required": false,
+                        "type": "array"
+                    },
+                    {
+                        "description": "List of job UUIDs. Only jobs with the specified UUIDs are returned.",
+                        "in": "query",
+                        "items": {
+                            "type": "string"
+                        },
+                        "name": "ids",
+                        "required": false,
+                        "type": "array"
+                    },
+                    {
+                        "description": "Local name of job(s) to return.",
+                        "format": "string",
+                        "in": "query",
+                        "name": "name",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "FQN of job to return.",
+                        "format": "string",
+                        "in": "query",
+                        "name": "fqn",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "If `true`, jobs that partially match the specified FQN are returned.",
+                        "format": "boolean",
+                        "in": "query",
+                        "name": "matchPartialFQN",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "Return jobs that use the package specified by UUID.",
+                        "format": "string",
+                        "in": "query",
+                        "name": "package_id",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "Filter jobs with a specific binding FQN.",
+                        "format": "string",
+                        "in": "query",
+                        "name": "BindingFQN",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "Return jobs bound to services on the specified provider.",
+                        "format": "string",
+                        "in": "query",
+                        "name": "ProviderFQN",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "Return jobs bound to the specified service.",
+                        "format": "string",
+                        "in": "query",
+                        "name": "ServiceFQN",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "Limits the number of jobs returned in the response. By default, all jobs are returned.",
+                        "format": "string",
+                        "in": "query",
+                        "name": "count",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "Specifies the number of the results page to fetch. By default, the first page of results is returned.",
+                        "format": "string",
+                        "in": "query",
+                        "name": "page",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "If `true`, the response includes health metrics for the job.",
+                        "format": "boolean",
+                        "in": "query",
+                        "name": "health",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "items": {
+                                "$ref": "#/definitions/Job"
+                            },
+                            "type": "array"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "List jobs.",
+                "tags": [
+                    "Jobs"
+                ]
+            },
+            "post": {
+                "description": "Creates a new job from the Job object passed in the POST body. The only required property in the request object is `fqn` ([Fully Qualified Name](http://docs.apcera.com/reference/glossary/#fqn)).",
+                "operationId": "jobsPost",
+                "parameters": [
+                    {
+                        "description": "An object that defines the properties of the new job. The only required parameter is `fqn`.",
+                        "in": "body",
+                        "name": "Job",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Job"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A successful response returns the newly created Job object.",
+                        "schema": {
+                            "$ref": "#/definitions/Job"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Creates a new job.",
+                "tags": [
+                    "Jobs"
+                ]
+            }
+        },
+        "/jobs/docker": {
+            "post": {
+                "description": "Downloads a Docker image from a registry and creates a job to run it.",
+                "operationId": "dockerJobsPost",
+                "parameters": [
+                    {
+                        "description": "Docker job object.",
+                        "in": "body",
+                        "name": "Job",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/CreateDockerJobRequest"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "A successful response returns a task object.",
+                        "schema": {
+                            "$ref": "#/definitions/CreateDockerJobResponse"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Creates a new job from a Docker image.",
+                "tags": [
+                    "Jobs"
+                ]
+            }
+        },
+        "/jobs/docker-job-check": {
+            "post": {
+                "description": "Checks a Docker job before creation to see if it will be allowed by [docker.allow policy](http://docs.apcera.com/policy/examples/docker/#docker-image-whitelisting).",
+                "operationId": "dockerJobCheck",
+                "parameters": [
+                    {
+                        "description": "The job object to check.",
+                        "in": "body",
+                        "name": "Job",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Job"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response."
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Checks a Docker job before creation to see if it will be allowed by docker.allow policy.",
+                "tags": [
+                    "Jobs"
+                ]
+            }
+        },
+        "/jobs/health": {
+            "get": {
+                "description": "If a job UUID is supplied that corresponds to a deleted or non-running job, or the user does not have 'permit read' on the job that they requested health for, the health score will not be in the result.",
+                "parameters": [
+                    {
+                        "description": "List of job UUIDs separated by commas.",
+                        "in": "query",
+                        "name": "ids",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "$ref": "#/definitions/JobHealth"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Retrieves health information for a job with a specific UUID.",
+                "tags": [
+                    "Jobs"
+                ]
+            }
+        },
+        "/jobs/routes": {
+            "get": {
+                "description": "Returns a list of job routes.  ",
+                "operationId": "jobsRoutesGet",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "additionalProperties": {
+                                "items": {
+                                    "type": "string"
+                                },
+                                "type": "array"
+                            },
+                            "type": "object"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Returns a list of all route endpoints that each map to an array of job UUIDs assigned to the endpoint.",
+                "tags": [
+                    "Jobs"
+                ]
+            }
+        },
+        "/jobs/routes/{endpoint}": {
+            "get": {
+                "operationId": "jobsRoutesEndpointGet",
+                "parameters": [
+                    {
+                        "description": "Base64-encoded endpoint URL.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "endpoint",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "additionalProperties": {
+                                "items": {
+                                    "type": "string"
+                                },
+                                "type": "array"
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "400": {
+                        "description": "Malformed request. Make sure the URL endpoint is [URL-safe Base64-encoded](https://en.wikipedia.org/wiki/Base64#URL_applications)."
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Returns a map of the specified endpoint to an array of job UUIDs that are assigned to the endpoint.",
+                "tags": [
+                    "Jobs"
+                ]
+            }
+        },
+        "/jobs/{uuid}": {
+            "delete": {
+                "description": "Deletes the specified job.",
+                "parameters": [
+                    {
+                        "description": "UUID of the job to delete.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response."
+                    },
+                    "404": {
+                        "description": "Job not found.",
+                        "schema": {
+                            "$ref": "#/definitions/APIError"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Deletes the specified job.",
+                "tags": [
+                    "Jobs"
+                ]
+            },
+            "get": {
+                "description": "Returns details about the specified job.",
+                "operationId": "jobsUuidGet",
+                "parameters": [
+                    {
+                        "description": "UUID of the job to fetch.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "$ref": "#/definitions/Job"
+                        }
+                    },
+                    "404": {
+                        "description": "Job not found.",
+                        "schema": {
+                            "$ref": "#/definitions/APIError"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Returns details about the specified job.",
+                "tags": [
+                    "Jobs"
+                ]
+            },
+            "put": {
+                "description": "Updates the specified job.",
+                "operationId": "jobsUuidPut",
+                "parameters": [
+                    {
+                        "description": "UUID of the job to update.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "description": "A JSON object describing the full job object to update, including new values for any properties to update on the job.",
+                        "in": "body",
+                        "name": "Job",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Job"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A successful response contains the updated Job object.",
+                        "schema": {
+                            "$ref": "#/definitions/Job"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Updates a job.",
+                "tags": [
+                    "Jobs"
+                ]
+            }
+        },
+        "/jobs/{uuid}/compliance": {
+            "get": {
+                "description": "Checks the specified job for policy compliance. It checks job routes, bindings, resources, etc. for any violations according to current policy.",
+                "parameters": [
+                    {
+                        "description": "UUID of the job to check for compliance.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response."
+                    },
+                    "400": {
+                        "description": "Failed to locate the specified job."
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Checks the specified job for policy compliance.",
+                "tags": [
+                    "Jobs"
+                ]
+            }
+        },
+        "/jobs/{uuid}/files/{path}": {
+            "get": {
+                "description": "Returns information about an instance's underlying file system.",
+                "parameters": [
+                    {
+                        "description": "UUID of the job whose file system information should be retrieved.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "description": "The path to the root folder for which to generate the folder/file listing. For example, `/jobs/<uuid>/files/` returns a listing for the instance's root folder, and `/jobs/<uuid>/files/app` returns a list of the instance's `/app` folder. ",
+                        "in": "path",
+                        "name": "path",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A successful response returns a list of folders and files in the specified path.",
+                        "schema": {
+                            "items": {
+                                "$ref": "#/definitions/FileListing"
+                            },
+                            "type": "array"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Returns information about an instance's underlying file system.",
+                "tags": [
+                    "Jobs"
+                ]
+            }
+        },
+        "/jobs/{uuid}/instances": {
+            "get": {
+                "description": "Returns instances from the health manager for a given job UUID.",
+                "parameters": [
+                    {
+                        "description": "UUID of the job.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response."
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Returns instances from the health manager for a given job UUID.",
+                "tags": [
+                    "Jobs"
+                ]
+            }
+        },
+        "/jobs/{uuid}/instances/{instance_uuid}": {
+            "delete": {
+                "description": "Issues a stop request to the specified job instance.",
+                "parameters": [
+                    {
+                        "description": "UUID of the job.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "description": "UUID of the job instance to stop.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "instance_uuid",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response."
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Stop a given instance of a job.",
+                "tags": [
+                    "Jobs"
+                ]
+            }
+        },
+        "/job/{uuid}/instances/{instance_uuid}/snapshot": {
+            "post": {
+                "description": "Issues a snapshot request to the specified job instance.",
+                "parameters": [
+                    {
+                        "description": "UUID of the job to be snapshotted.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "description": "UUID of the instance to be snapshotted.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "instance_uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "description": "FQN of snapshot package to return.",
+                        "format": "string",
+                        "in": "query",
+                        "name": "pkgFQN",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "description": "Directory of a given job/capsule to snapshot.",
+                        "format": "string",
+                        "in": "query",
+                        "name": "directory",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A successful response indicates the snapshot was created successfully."
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Creates a snapshot of a instance of a job.",
+                "tags": [
+                    "Jobs"
+                ]
+            }
+        },
+        "/jobs/{uuid}/logs": {
+            "get": {
+                "description": "Returns logs for the specified job.",
+                "parameters": [
+                    {
+                        "description": "UUID of the job to retrieve logs for.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+						"schema": {
+							"type": "string"
+						}
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Returns logs for the specified job.",
+                "tags": [
+                    "Jobs"
+                ]
+            }
+        },
+        "/jobs/{uuid}/logs/drains": {
+            "get": {
+                "description": "Returns all configured log drains for the specified job.",
+                "operationId": "jobsUuidLogsDrainsGet",
+                "parameters": [
+                    {
+                        "description": "UUID of the job to retrieve log drains for.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "$ref": "#/definitions/Drain"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Returns all log drains for the specified job.",
+                "tags": [
+                    "Jobs"
+                ]
+            },
+            "post": {
+                "description": "Creates a log drain on the specified job from the `drain` parameter in the request body.",
+                "operationId": "jobsUuidLogsDrainsPost",
+                "parameters": [
+                    {
+                        "description": "UUID of the job.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "description": "Drain object to add to job.",
+                        "in": "body",
+                        "name": "drain",
+                        "schema": {
+                            "$ref": "#/definitions/Drain"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "$ref": "#/definitions/Drain"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Creates a log drain on the specified job.",
+                "tags": [
+                    "Jobs"
+                ]
+            }
+        },
+        "/jobs/{uuid}/logs/drains/{drain_uuid}": {
+            "delete": {
+                "description": "Deletes the specified log drain from the specified job.",
+                "operationId": "jobsUuidLogsDrainsDrainUuidDelete",
+                "parameters": [
+                    {
+                        "description": "UUID of the job with the log drain to delete.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "description": "UUID of the log drain to delete.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "drain_uuid",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "$ref": "#/definitions/Drain"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Deletes a log drain from a job.",
+                "tags": [
+                    "Jobs"
+                ]
+            }
+        },
+        "/jobs/{uuid}/tunnel": {
+            "get": {
+                "description": "Creates a bi-directional tunnel with the job/instance UUID specified.",
+                "parameters": [
+                    {
+                        "description": "UUID of the job.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response."
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Creates a bi-directional tunnel with the job/instance UUID specified.",
+                "tags": [
+                    "Jobs"
+                ]
+            }
+        },
+        "/jobs/{uuid}/tunnel/{instance_id}": {
+            "get": {
+                "description": "Creates a bi-directional tunnel with the job/instance UUID specified.",
+                "parameters": [
+                    {
+                        "description": "UUID of the job.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "description": "UUID of the job instance.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "instance_id",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response."
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Creates a bi-directional tunnel with the job/instance UUID specified.",
+                "tags": [
+                    "Jobs"
+                ]
+            }
+        },
+        "/logs/{channel}": {
+            "get": {
+                "parameters": [
+                    {
+                        "description": "TBD",
+                        "in": "path",
+                        "name": "channel",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response."
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Streams logs for the specified channel.",
+                "tags": [
+                    "Logs"
+                ]
+            }
+        },
+        "/metrics/cluster": {
+            "get": {
+                "description": "Returns metrics data for the cluster.",
+                "parameters": [
+                    {
+                        "collectionFormat": "multi",
+                        "description": "Comma-delimited string that includes, in order, the following fields: \n * Job FQN (wildcards accepted) \n * Instance manager hostname (can be a wildcard)\n * Instance ID \n * Metric to evaluate \n * 'From' time (optional)\n * 'To' time (optional).",
+                        "in": "query",
+                        "items": {
+                            "type": "string"
+                        },
+                        "name": "metric",
+                        "type": "array"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "$ref": "#/definitions/Metrics"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Returns metrics data for the cluster.",
+                "tags": [
+                    "Metrics"
+                ]
+            }
+        },
+        "/metrics/instance_managers": {
+            "get": {
+                "description": "Returns metrics for instance managers.",
+                "parameters": [
+                    {
+                        "collectionFormat": "multi",
+                        "in": "query",
+                        "items": {
+                            "type": "string"
+                        },
+                        "name": "metric",
+                        "type": "array"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "$ref": "#/definitions/Metrics"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Returns metrics for instance managers.",
+                "tags": [
+                    "Metrics"
+                ]
+            }
+        },
+        "/metrics/jobs": {
+            "get": {
+                "description": "Returns job metrics.",
+                "parameters": [
+                    {
+                        "collectionFormat": "multi",
+                        "description": "Comma-delimited string that includes, in order, the following fields: \n * Job FQN (wildcards accepted) \n * Instance manager hostname (can be a wildcard)\n * Instance ID \n * Metric to evaluate \n * 'From' time (optional)\n * 'To' time (optional).",
+                        "in": "query",
+                        "items": {
+                            "type": "string"
+                        },
+                        "name": "metric",
+                        "type": "array"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "$ref": "#/definitions/Metrics"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Returns job metrics.",
+                "tags": [
+                    "Metrics"
+                ]
+            }
+        },
+        "/metrics/route/counters": {
+            "get": {
+                "parameters": [
+                    {
+                        "collectionFormat": "multi",
+                        "in": "query",
+                        "items": {
+                            "type": "string"
+                        },
+                        "name": "metric",
+                        "type": "array"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "$ref": "#/definitions/Metrics"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Returns metrics for counters on the route.",
+                "tags": [
+                    "Metrics"
+                ]
+            }
+        },
+        "/metrics/route/timers": {
+            "get": {
+                "parameters": [
+                    {
+                        "collectionFormat": "multi",
+                        "in": "query",
+                        "items": {
+                            "type": "string"
+                        },
+                        "name": "metric",
+                        "type": "array"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "$ref": "#/definitions/Metrics"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Returns metrics for timers on the route.",
+                "tags": [
+                    "Metrics"
+                ]
+            }
+        },
+        "/namespace/default": {
+            "get": {
+                "description": "Returns the default namespace for the currently logged-in user.",
+                "operationId": "namespaceDefaultGet",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "$ref": "#/definitions/Namespace"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Returns the default namespace for the currently logged-in user.",
+                "tags": [
+                    "Utilities"
+                ]
+            }
+        },
+        "/packages": {
+            "get": {
+                "description": "Returns a list of packages on the cluster, optionally filtered by package name, FQN, UUID or other properties. Pagination is also supported.",
+                "operationId": "packagesGet",
+                "parameters": [
+                    {
+                        "description": "List of tags. Only packages with the specified tags are returned.",
+                        "in": "query",
+                        "items": {
+                            "type": "string"
+                        },
+                        "name": "tag",
+                        "required": false,
+                        "type": "array"
+                    },
+                    {
+                        "description": "List of excluded tags. Only packages without the specified tags are returned.",
+                        "in": "query",
+                        "items": {
+                            "type": "string"
+                        },
+                        "name": "excluded_tags",
+                        "required": false,
+                        "type": "array"
+                    },
+                    {
+                        "description": "List of package UUIDs. Only packages with specifed UUIDs to return.",
+                        "in": "query",
+                        "items": {
+                            "type": "string"
+                        },
+                        "name": "ids",
+                        "required": false,
+                        "type": "array"
+                    },
+                    {
+                        "description": "Local name of package to return.",
+                        "format": "string",
+                        "in": "query",
+                        "name": "name",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "FQN of package to return.",
+                        "format": "string",
+                        "in": "query",
+                        "name": "fqn",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "If `true`, packages that partially match the FQN specified by `fqn` parameter are returned. If `false` (default) then `fqn` must exactly match an available package.",
+                        "format": "boolean",
+                        "in": "query",
+                        "name": "matchPartialFQN",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "UUID of the package to return.",
+                        "format": "string",
+                        "in": "query",
+                        "name": "package_id",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "Type of packages to return. Valid values are `os`, `package`, `runtime`, or `file`. ",
+                        "enum": [
+                            "file",
+                            "package",
+                            "runtime",
+                            "os"
+                        ],
+                        "format": "string",
+                        "in": "query",
+                        "name": "provides_type",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "Name that describes the packages to return. Value can be an exact package name ('java-1.6' or 'ubuntu-13.10', for example) or a generalized requirement ('linux', for example).",
+                        "format": "string",
+                        "in": "query",
+                        "name": "provides_name",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "items": {
+                                "$ref": "#/definitions/Package"
+                            },
+                            "type": "array"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Returns a list of packages on the cluster.",
+                "tags": [
+                    "Packages"
+                ]
+            },
+            "post": {
+                "description": "Creates a new package from the provided JSON object.",
+                "parameters": [
+                    {
+                        "description": "An object that defines the properties of the new package.",
+                        "in": "body",
+                        "name": "pkg",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Package"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful completion returns the definition of the newly created package.",
+                        "schema": {
+                            "$ref": "#/definitions/Package"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Creates a new package.",
+                "tags": [
+                    "Packages"
+                ]
+            }
+        },
+        "/packages/dependencies": {
+            "post": {
+                "description": "Returns a list of packages that fulfill the specified dependency type and name for the specified namespace.",
+                "parameters": [
+                    {
+                        "description": "JSON object that identifies the namespace we're resolving dependencies within, and the package dependencies that need to be fully resolved.",
+                        "in": "body",
+                        "name": "targetjob_resource",
+                        "schema": {
+                            "$ref": "#/definitions/PackageDependsRequest"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response is a list of Package objects.",
+                        "schema": {
+                            "items": {
+                                "$ref": "#/definitions/Package"
+                            },
+                            "type": "array"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Returns a list of packages that fulfill the specified dependency type and name for the specified namespace.",
+                "tags": [
+                    "Packages"
+                ]
+            }
+        },
+        "/packages/resources/{uuid}": {
+            "get": {
+                "description": "Downloads the specified package's binary resource.",
+                "parameters": [
+                    {
+                        "description": "UUID of the package.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation downloads the binary resource to the current working directory."
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Downloads the specified package's binary resource.",
+                "tags": [
+                    "Packages"
+                ]
+            },
+            "put": {
+                "consumes": [
+                    "application/octet-stream"
+                ],
+                "description": "Uploads package resources for the specified package.",
+                "parameters": [
+                    {
+                        "description": "UUID of the package.",
+                        "in": "path",
+                        "name": "uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "description": "Binary package resource (GZIP). The resource's content length and SHA must match the values specified made in a previous call to [`POST /packages`](#operation--packages-post).",
+                        "in": "body",
+                        "name": "BinaryData",
+                        "required": true,
+                        "schema": {
+                            "format": "byte",
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response."
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Uploads package resources for the specified package.",
+                "tags": [
+                    "Packages"
+                ]
+            }
+        },
+        "/packages/{package_uuid}/resources/{resource_uuid}": {
+            "put": {
+                "consumes": [
+                    "application/octet-stream"
+                ],
+                "description": "Uploads a specific package resource to the specified package.",
+                "parameters": [
+                    {
+                        "description": "UUID of the package.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "package_uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "description": "UUID of the resource.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "resource_uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "description": "Binary package resource (GZIP). The resource's content length and SHA must match the values specified made in a previous call to [`POST /packages`](#operation--packages-post).",
+                        "in": "body",
+                        "name": "BinaryData",
+                        "required": true,
+                        "schema": {
+                            "format": "byte",
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    },
+                    {
+                        "in": "header",
+                        "name": "Content-Digest",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response."
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Uploads a package resource for the specified package.",
+                "tags": [
+                    "Packages"
+                ]
+            }
+        },
+        "/packages/{uuid}": {
+            "delete": {
+                "description": "Deletes the specified package.",
+                "parameters": [
+                    {
+                        "description": "UUID of the package to delete.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response."
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Deletes the specified package.",
+                "tags": [
+                    "Packages"
+                ]
+            },
+            "get": {
+                "description": "Returns the specified package.",
+                "operationId": "packagesUuidGet",
+                "parameters": [
+                    {
+                        "description": "UUID of the package.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "$ref": "#/definitions/Package"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Returns the specified package.",
+                "tags": [
+                    "Packages"
+                ]
+            },
+            "put": {
+                "description": "Updates the specified package with the properties defined in the provided package object.",
+                "parameters": [
+                    {
+                        "description": "UUID of the package.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "description": "A Package object containing the updated properties for the specified package.",
+                        "in": "body",
+                        "name": "package",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Package"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response."
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Updates the specified package's properties.",
+                "tags": [
+                    "Packages"
+                ]
+            }
+        },
+        "/providers": {
+            "get": {
+                "description": "Returns a list of providers defined on the cluster.",
+                "operationId": "providersGet",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "items": {
+                                "$ref": "#/definitions/Provider"
+                            },
+                            "type": "array"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Returns a list of providers defined on the cluster.",
+                "tags": [
+                    "Providers"
+                ]
+            },
+            "post": {
+                "description": "Creates a new provider.",
+                "parameters": [
+                    {
+                        "description": "An object that defines the properties of the new provider.",
+                        "in": "body",
+                        "name": "Job",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Provider"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "items": {
+                                "$ref": "#/definitions/Provider"
+                            },
+                            "type": "array"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Creates a new provider.",
+                "tags": [
+                    "Providers"
+                ]
+            }
+        },
+        "/providers/{uuid}": {
+            "delete": {
+                "description": "Deletes the specified provider.",
+                "parameters": [
+                    {
+                        "description": "UUID of the provider to delete.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response."
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Deletes the specified provider.",
+                "tags": [
+                    "Providers"
+                ]
+            }
+        },
+        "/rules": {
+            "get": {
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response."
+                    }
+                },
+                "summary": "Lists all policy rules.",
+                "tags": [
+                    "Rules"
+                ]
+            },
+            "post": {
+                "parameters": [
+                    {
+                        "description": "An object that defines the properties of the new rule.",
+                        "in": "body",
+                        "name": "Rule",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/SemiPipeRule"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response."
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Creates a new semantic pipeline rule for governing a given provider's behavior.",
+                "tags": [
+                    "Rules"
+                ]
+            }
+        },
+        "/rules/{uuid}": {
+            "delete": {
+                "parameters": [
+                    {
+                        "description": "UUID of the rule.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response."
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Deletes a policy event rule.",
+                "tags": [
+                    "Rules"
+                ]
+            },
+            "get": {
+                "description": "Returns information about a rule that that controls the behavior of semantic pipelines.",
+                "parameters": [
+                    {
+                        "description": "UUID of the rule.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "$ref": "#/definitions/Rule"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Returns information about a rule that that controls the behavior of semantic pipelines.",
+                "tags": [
+                    "Rules"
+                ]
+            }
+        },
+        "/runtimes": {
+            "get": {
+                "description": "Lists file names and patterns used by APC to determine the appropriate staging pipeline to stage a given workload.",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "items": {
+                                "$ref": "#/definitions/Runtime"
+                            },
+                            "type": "array"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Lists supported workload runtimes.",
+                "tags": [
+                    "Utilities"
+                ]
+            }
+        },
+        "/services": {
+            "get": {
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "items": {
+                                "$ref": "#/definitions/Service"
+                            },
+                            "type": "array"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Lists available services.",
+                "tags": [
+                    "Services and Bindings"
+                ]
+            },
+            "post": {
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    },
+                    {
+                        "description": "Describes the service to create.",
+                        "in": "body",
+                        "name": "service_request",
+                        "schema": {
+                            "$ref": "#/definitions/ServiceRequestObject"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "$ref": "#/definitions/Service"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Creates a new service.",
+                "tags": [
+                    "Services and Bindings"
+                ]
+            }
+        },
+        "/services/{uuid}": {
+            "delete": {
+                "parameters": [
+                    {
+                        "description": "UUID of the service.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response."
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Deletes the specified service.",
+                "tags": [
+                    "Services and Bindings"
+                ]
+            }
+        },
+        "/stagingpipelines": {
+            "get": {
+                "description": "Lists all staging pipelines. To return a single staging pipeline specify its fully qualified name in the `fqn` query parameter.",
+                "parameters": [
+                    {
+                        "description": "The fully qualified name the staging pipeline to retrieve.",
+                        "in": "query",
+                        "name": "fqn",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "items": {
+                                "$ref": "#/definitions/StagingPipeline"
+                            },
+                            "type": "array"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Lists all staging pipelines",
+                "tags": [
+                    "Staging Pipelines"
+                ]
+            },
+            "post": {
+                "description": "Creates a new staging pipeline.",
+                "parameters": [
+                    {
+                        "description": "Staging pipeline object to create.",
+                        "in": "body",
+                        "name": "staging_pipeline",
+                        "schema": {
+                            "$ref": "#/definitions/StagingPipeline"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response."
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Creates a new staging pipeline.",
+                "tags": [
+                    "Staging Pipelines"
+                ]
+            }
+        },
+        "/stagingpipelines/{uuid}": {
+            "delete": {
+                "parameters": [
+                    {
+                        "description": "UUID of the staging pipeline.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response."
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Deletes the specified staging pipeline.",
+                "tags": [
+                    "Staging Pipelines"
+                ]
+            },
+            "get": {
+                "parameters": [
+                    {
+                        "description": "UUID of the staging pipeline.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response."
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Shows the specified staging pipeline.",
+                "tags": [
+                    "Staging Pipelines"
+                ]
+            },
+            "put": {
+                "parameters": [
+                    {
+                        "description": "UUID of the staging pipeline.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "uuid",
+                        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response."
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Updates the specified staging pipeline.",
+                "tags": [
+                    "Staging Pipelines"
+                ]
+            }
+        },
+        "/tags": {
+            "get": {
+                "description": "Lists all tags on all instance managers in the cluster. Requires `read` privileges on the `cluster` realm.",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response."
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Lists all tags on all instance managers in the cluster. ",
+                "tags": [
+                    "Instances"
+                ]
+            }
+        },
+        "/tasks/{uuid}": {
+            "get": {
+                "description": "Returns the requested Task, which contains a list of task events. A client can poll this endpoint to check the status of a task. Optionally, a client can request a websocket connection over which tasks are streamed in real-time.",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    },
+                    {
+                        "description": "If specified, only task events that occurred after the specified time are returned. If not specified, all task events are returned.",
+                        "format": "string",
+                        "in": "query",
+                        "name": "time",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "UUID of task.",
+                        "format": "string",
+                        "in": "path",
+                        "name": "uuid",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "default": "websocket",
+                        "description": "Header required to upgrade connection to websocket. Value must be 'websocket'.",
+                        "in": "header",
+                        "name": "Upgrade",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "default": "upgrade",
+                        "description": "Header required to upgrade connection to websocket. Value must be 'Upgrade'.",
+                        "in": "header",
+                        "name": "Connection",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "Header required to upgrade connection to websocket. Value is base64-encoded random bytes.",
+                        "in": "header",
+                        "name": "Sec-WebSocket-Key",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+	                        "$ref": "#/definitions/Task"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Returns a list of task events for a given task.",
+                "tags": [
+                    "Jobs"
+                ]
+            }
+        },
+        "/unbind": {
+            "post": {
+                "description": "Removes a service binding from a job.",
+                "parameters": [
+                    {
+                        "description": "An object that specifies the job and service to unbind.",
+                        "in": "body",
+                        "name": "Job",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UnbindParameterObject"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response."
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Removes a service binding from a job.",
+                "tags": [
+                    "Jobs",
+                    "Services and Bindings"
+                ]
+            }
+        },
+        "/unlink": {
+            "post": {
+                "description": "Removes a link between two jobs. The binding record is only removed from the `from_job` property of the request object.",
+                "parameters": [
+                    {
+                        "description": "An object that specifies the two jobs to link and the port to use on the target job.",
+                        "in": "body",
+                        "name": "Job",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UnlinkParameterObject"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response."
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Removes a link between two jobs.",
+                "tags": [
+                    "Jobs"
+                ]
+            }
+        },
+        "/version": {
+            "get": {
+                "description": "Returns the version number of the API Server.",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/authHeaderParameter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "schema": {
+                            "properties": {
+                                "build_number": {
+                                    "description": "API Server version.",
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "authorization": []
+                    }
+                ],
+                "summary": "Returns the version number of the API Server.",
+                "tags": [
+                    "Utilities"
+                ]
+            }
+        }
+    },
+    "produces": [
+        "application/json"
+    ],
+    "schemes": [
+        "https"
+    ],
+    "securityDefinitions": {
+        "authorization": {
+            "in": "header",
+            "name": "authorization",
+            "type": "apiKey"
+        }
+    },
+    "swagger": "2.0",
+    "tags": [
+        {
+            "description": "Manage jobs in a cluster.",
+            "name": "Jobs"
+        },
+        {
+            "description": "Manage providers in a cluster.",
+            "name": "Providers"
+        },
+        {
+            "description": "Manage packages in a cluster.",
+            "name": "Packages"
+        },
+        {
+            "description": "Manage services and bindings in a cluster.",
+            "name": "Services and Bindings"
+        },
+        {
+            "description": "Miscellaneous APIs.",
+            "name": "Utilities"
+        },
+        {
+            "description": "Get information about instance managers and instances in a cluster.",
+            "name": "Instances"
+        },
+        {
+            "description": "Manage rules that govern services and semantic pipelines.",
+            "name": "Rules"
+        },
+        {
+            "description": "Access cluster, job, and instance manager metrics.",
+            "name": "Metrics"
+        },
+        {
+            "description": "Retrieve application and audit logs.",
+            "name": "Logs"
+        },
+        {
+            "description": "Manage staging pipelines.",
+            "name": "Staging Pipelines"
+        }
+    ]
+}
