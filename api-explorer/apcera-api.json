@@ -1766,7 +1766,7 @@
             }
         }
     },
-    "host": "api.cosmic.apcera-platform.io",
+    "host": "api.<your-cluster-domain>",
     "info": {
         "description": "REST APIs used to manage an Apcera cluster and its resources. ",
         "title": "Apcera APIs",
