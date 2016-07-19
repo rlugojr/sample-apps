@@ -80,8 +80,8 @@ White-listing your deployed API Explorer involves SSH'ing to the cluster, editin
                 "https://auth.example.com",
                 "https://console.example.com",
                 "https://console-lucid.example.com",
-                "http://localhost:9000"
-                "http://apiexplorer.example.com"
+                "http://localhost:9000",
+                "http://apiexplorer.example.com",
                 "https://apiexplorer.example.com"
               ]
               ...
