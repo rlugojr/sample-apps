@@ -28,7 +28,7 @@ To make API calls you need to provide the API Explorer with your API token. An e
    
 **To provide your API token**:
 
-1. Open `~./apc` (or `$HOME/.apc`) in a text editor.
+1. Open `~/.apc` (or `$HOME/.apc`) in a text editor.
 2. Locate the `tokens` field for your cluster, e.g.
 
         {
@@ -68,6 +68,6 @@ To the right of each API endpoint are collapsible sections that display that API
 
 Below are common errors you may encounter using API Explorer.
 
-* **"Header must have a preamble and a token separated by a space"** -- If the response body to API request contains this, it means that the request did not contain the API token. Try setting your API token again (see [Providing your API token](#token)).
+* **"Header must have a preamble and a token separated by a space"** -- If a response body contains this message it means that the request did not contain the API token. Try setting your API token again (see [Providing your API token](#token)).
 
-* **"illegal base64 data..."** -- If the response body to API request contains this, it means the API token you provided contained an expected character. This can occur sometimes when copying the token from an application that uses a non-standard text encoding. Try copying the token into a plain text document first and then copying the value from that location. 
+* **"illegal base64 data..."** -- If the response body contains this type of message it means the API token you provided contained an expected character. This can occur sometimes when copying the token from an application that uses a non-standard text encoding. Try copying the token into a plain text document first and then copying the value from that location. 
