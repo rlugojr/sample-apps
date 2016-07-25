@@ -1,6 +1,6 @@
 # Basic Go Event Client
 
-This sample demonstrates how to create a basic Go application that [streams events](/api/events-system-api/) from an Apcera cluster. The application uses the open-source [events library](https://github.com/apcera/util/tree/master/events) library from Apcera that, in turn, depends on the open-source [Turnpike](https://github.com/jcelliott/turnpike) WAMP client library.
+This sample demonstrates how to create a simple Go application that uses the [Events System API](http://docs.apcera.com/api/events-system-api/) to stream events from an Apcera cluster. The application uses open-source [events library](https://github.com/apcera/util/tree/master/events) library from Apcera that depends on the open-source [Turnpike](https://github.com/jcelliott/turnpike) WAMP client library.
 
 The application takes two parameters: the API endpoint on your cluster to connect to the WAMP router, and the FQN of the cluster resource for which you want to receive events, for example:
 
