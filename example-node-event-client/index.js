@@ -17,7 +17,8 @@ if (token == undefined) {
 }
 
 var wampRealm = "com.apcera.api.es";
-var wampAPIEndpoint = "api.cosmic.apcera-platform.io/v1/wamp"
+// Change the cluster name/location for your Apcera cluster:
+var wampAPIEndpoint = "api.example.com/v1/wamp"
 var wampURL = "ws://" + wampAPIEndpoint;
 if (token != undefined) {
     wampURL += "?authorization=" + token;

@@ -10,7 +10,11 @@ The application contains a variable named `subscribeFQN` that specifies the FQN 
 
 Deploying the Node.js app to an Apcera cluster lets you take advantage of the application token feature.
 
-1. From a terminal, change to the example-node-event-client directory and deploy the application to your cluster:
+1. Open index.js in a text editor and change the cluster name in the `wampAPIEndpoint` variable to point to your cluster. For example, if your cluster is located on `example.com`, change the value to the following:
+   
+        var wampAPIEndpoint = "api.example.com/v1/wamp"
+        
+2. From a terminal, change to the example-node-event-client directory and deploy the application to your cluster:
    
         cd example-node-event-client
         apc namespace /sandbox/admin
