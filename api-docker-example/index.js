@@ -3,69 +3,74 @@ var WebSocket = require('ws');
 
 var client = new Client();
 
-var dockerCreateEndpoint = "http://api.cosmic.apcera-platform.io/v1/jobs/docker"
+// Change API endpoint to point to your cluster (e.g. api.my-cluster.com/v1/jobs/docker)
+var dockerCreateEndpoint = "http://api.example.com/v1/jobs/docker"
 
-// set content-type header and data as json in args parameter
-
+// Docker request object (http://docs.apcera.com/api/api-models/#createdockerjobrequest)
+// Change <USER> to your username
 var dockerRequestObject = `{
-  "allow_egress":true,
-  "exposed_ports":[
-    2368
-  ],
-  "image_url":"https://registry-1.docker.io/library/ghost:latest",
-  "job_fqn":"job::/sandbox/admin::ghost-blog",
-  "resources":{
-    "cpu":0,
-    "disk":1073741824,
-    "memory":268435456,
-    "netmax":0,
-    "network":5000000
-  },
-  "restart_config":{
-    "maximum_attempts":0,
-    "restart_mode":"no"
-  },
-  "routes":{
-    "http://ghostblog.cosmic.apcera-platform.io":2368
-  },
-  "start":true,
-  "volume_provider_fqn": "provider::/apcera/providers::apcfs"
+  "image_url":"https://registry-1.docker.io/library/nats:latest",
+  "job_fqn":"job::/sandbox/<USER>::nats",
+  "start":true
 }`;
 
+// Request arguments
 var args = {
     data: dockerRequestObject,
-    headers: { "Content-Type": "application/json", "Authorization": "Bearer eyJ0eXAiOiIiLCJhbGciOiIifQ.eyJpc3MiOiJiYXNpY19hdXRoX3NlcnZlckBhcGNlcmEubWUiLCJhdWQiOiJhcGNlcmEubWUiLCJpYXQiOjE0Njk4MDU0MTMsImV4cCI6MTQ2OTg5MTgyMywicHJuIjoiYWRtaW5AYXBjZXJhLm1lIiwiY2xhaW1zIjpbeyJJc3N1ZXIiOiJhdXRoX3NlcnZlckBhcGNlcmEubWUiLCJUeXBlIjoiYXV0aFR5cGUiLCJWYWx1ZSI6ImJhc2ljQXV0aCJ9XX0.MEUCIQDPqZVat4rKwIuHuujLzbjCSzvYcxeSBWsvXmgIMC6JJAIgNojxNzfd4uG1Ea8p3xhXhA7DMyqJaoJFkPeoHk6QeJs" }
+    headers: {
+        "Content-Type": "application/json"
+    }
 };
 
-client.post(dockerCreateEndpoint, args, function (data, response) {
-
-    if(response.statusCode == '200') {
-        streamTaskEvents(data.location)
-    } else {
-        console.log("ERROR: " + response.statusMessage, response.statusCode);
-        console.log(data);
-    }
-});
-
-
+// Creates a websocket and stream events
 function streamTaskEvents(taskLocation) {
-    console.log(taskLocation);
-    var ws = new WebSocket(taskLocation + "?authorization=Bearer eyJ0eXAiOiIiLCJhbGciOiIifQ.eyJpc3MiOiJiYXNpY19hdXRoX3NlcnZlckBhcGNlcmEubWUiLCJhdWQiOiJhcGNlcmEubWUiLCJpYXQiOjE0Njk4MDU0MTMsImV4cCI6MTQ2OTg5MTgyMywicHJuIjoiYWRtaW5AYXBjZXJhLm1lIiwiY2xhaW1zIjpbeyJJc3N1ZXIiOiJhdXRoX3NlcnZlckBhcGNlcmEubWUiLCJUeXBlIjoiYXV0aFR5cGUiLCJWYWx1ZSI6ImJhc2ljQXV0aCJ9XX0.MEUCIQDPqZVat4rKwIuHuujLzbjCSzvYcxeSBWsvXmgIMC6JJAIgNojxNzfd4uG1Ea8p3xhXhA7DMyqJaoJFkPeoHk6QeJs");
+    // Create new WebSocket using `location` URL
+    var ws = new WebSocket(taskLocation);
 
     ws.on('open', function open() {
-      console.log("WebSocket connection established.")
+        console.log("WebSocket connection established, waiting for task events...");
     });
 
     ws.on('error', function open(err) {
-      console.log("Error establishing connection.", err)
+        console.log("Error establishing connection.", err)
     });
 
+    ws.on('close', function close() {
+        console.log("WebSocket connection closed.")
+    });
+
+    // Each message is a TaskEvent object (http://docs.apcera.com/api/api-models/#taskevent)
     ws.on('message', function(data, flags) {
-      // flags.binary will be set if a binary data is received.
-      // flags.masked will be set if the data was masked.
-      var response = JSON.parse(data);
-      console.log(response)
-      // console.log(response.thread, response.stage);
+        var taskEvent = JSON.parse(data);
+        var eventType = taskEvent.task_event_type;
+        if (eventType == "error") {
+            console.log("Task error: " + taskEvent.payload.error);
+            return;
+        }
+        if (eventType == "eos") {
+            console.log("Task completed successfully.");
+            return;
+        }
+        var thread = taskEvent.thread;
+        var stage = taskEvent.stage;
+        var subtask = taskEvent.subtask;
+        console.log(stage, "-", subtask.name);
     });
-
 }
+
+// Make API call to /v1/jobs/docker. If successful, pass `location` field to streamTaskEvents() method.
+client.post(dockerCreateEndpoint, args, function(data, response) {
+    switch (response.statusCode) {
+        case 200:
+            console.log("/v1/jobs/docker API request successful.");
+            streamTaskEvents(data.location);
+            break;
+        case 400:
+            console.log("/v1/jobs/docker API error", data.message)
+            break;
+        default:
+            console.log(response.statusCode, data.message);
+    }
+}).on('error', function (err) {
+    console.log('Error contacting API endpoint.', dockerCreateEndpoint);
+});
