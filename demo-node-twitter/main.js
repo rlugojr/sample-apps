@@ -37,27 +37,32 @@ if(mysql_bind){
 	var uri = mysql_bind.replace(parse_database[3], "");
 	var connection = mysql.createPool(mysql_bind);
 	var connection_create = mysql.createPool(uri);
-	createtable(createtable_async);	
+	createtable(createtable_async);
 }
 
 if(consumer_key && consumer_secret && access_token_key && access_token_secret && twitter_topic){
-	client.stream('statuses/filter', {track: twitter_topic}, function(stream) {
-		stream.on('data', function(tweet) {
-			sendMessage(tweet.text);
-		});
-		
-		stream.on('error', function(error) {
-			console.log(error)
-		}); 
-	});
+	startListen();
 } else {
-	console.log('\n[Twitter Support disabled]\n');	
+	console.log('\n[Twitter Support disabled]\n');
+}
+
+
+function startListen () {
+	var stream = client.stream('statuses/filter', {track: twitter_topic});
+	stream.on('data', function(tweet) {
+		sendMessage(tweet.text);
+	});
+
+	stream.on('error', function(error) {
+		console.log('\nAn error has occurred.');
+		startListen();
+	});
 }
 
 function showAll (callback) {
 	data = "";
 	connection.getConnection(function(err,connection) {
-		connection.query("select * from twitter order by id desc limit 50;", function(err, rows) {	
+		connection.query("select * from twitter order by id desc limit 50;", function(err, rows) {
 			if (!err)  {
 				data = rows;
 			}else {
@@ -174,10 +179,10 @@ io.on('connection', function(socket){
 
 io.on('connection', function(socket){
 	socket.on('chat message', function(msg){
-//sendMessage(msg);
-showAll(showall_async);
-console.log('chat message: ' + msg);
-});
+		//sendMessage(msg);
+		showAll(showall_async);
+		console.log('chat message: ' + msg);
+	});
 });
 
 http.listen(port, function(){
