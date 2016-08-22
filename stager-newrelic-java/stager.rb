@@ -45,7 +45,7 @@ end
 # Example:
 # dependency_list = [{package:'<my_custom_package>'},{runtime:'<my_custom_runtime>'}]
 dependency_list = [
-    {package:'newrelic-java-3.20.0'}
+    {package:'newrelic-java-3.28.0'}
 ]
 
 # Add, download, and extract stager dependencies
