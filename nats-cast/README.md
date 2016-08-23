@@ -10,6 +10,7 @@ realtime.
 HTTP server that will serve the textbox.
 
 ```
+cd server
 apc app create cast-server --start --batch
 ```
 
@@ -31,6 +32,7 @@ These are console-based clients that will receive messages typed in the webpage
 textbox.
 
 ```
+cd client
 apc app create cast-client-1 --disable-routes --start --batch
 apc app create cast-client-2 --disable-routes --start --batch
 ```
