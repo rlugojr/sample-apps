@@ -1,0 +1,106 @@
+//Authorization
+on job::/sandbox/demo::jenkins-master {
+  { permit issue } 
+ { tokenTimeout "2592000s"}
+}
+
+on auth::/ {
+  if (auth_server@apcera.me->name beginsWith "job::/sandbox/demo::jenkins-master")
+  { 
+    defaultNamespace "/sandbox/demo" 
+  }
+}
+
+
+
+//Assign admin role to all policy realms
+
+on job::/ {
+if (auth_server@apcera.me->name == "job::/sandbox/demo::jenkins-master") { role admin }
+}
+
+on job::/ {
+if (auth_server@apcera.me->name == "job::/sandbox/demo::jenkins-master") { docker.allow "*" }
+}
+
+on package::/ {
+if (auth_server@apcera.me->name == "job::/sandbox/demo::jenkins-master") { role admin }
+}
+
+on service::/ {
+if (auth_server@apcera.me->name == "job::/sandbox/demo::jenkins-master") { role admin }
+}
+
+on network::/ {
+if (auth_server@apcera.me->name == "job::/sandbox/demo::jenkins-master") { role admin }
+}
+
+on stagpipe::/ {
+if (auth_server@apcera.me->name == "job::/sandbox/demo::jenkins-master") { role admin }
+}
+
+on route::/ {
+if (auth_server@apcera.me->name == "job::/sandbox/demo::jenkins-master") { role admin }
+}
+
+on provider::/ {
+if (auth_server@apcera.me->name == "job::/sandbox/demo::jenkins-master") { role admin }
+}
+
+on sempiperule::/ {
+if (auth_server@apcera.me->name == "job::/sandbox/demo::jenkins-master") { role admin }
+}
+
+//Rules for the Jenkins Slave
+
+
+on job::/sandbox/demo::jenkins-slave-1 {
+  { permit issue } 
+ { tokenTimeout "2592000s"}
+}
+
+on auth::/ {
+  if (auth_server@apcera.me->name beginsWith "job::/sandbox/demo::jenkins-slave-1")
+  { 
+    defaultNamespace "/sandbox/demo" 
+  }
+}
+
+on job::/ {
+if (auth_server@apcera.me->name == "job::/sandbox/demo::jenkins-slave-1") { role admin }
+}
+
+on package::/ {
+if (auth_server@apcera.me->name == "job::/sandbox/demo::jenkins-slave-1") { role admin }
+}
+
+on job::/ {
+if (auth_server@apcera.me->name == "job::/sandbox/demo::jenkins-slave-1") { docker.allow "*" }
+}
+
+on network::/ {
+if (auth_server@apcera.me->name == "job::/sandbox/demo::jenkins-slave-1") { role admin }
+}
+
+on stagpipe::/ {
+if (auth_server@apcera.me->name == "job::/sandbox/demo::jenkins-slave-1") { role admin }
+}
+
+on service::/ {
+if (auth_server@apcera.me->name == "job::/sandbox/demo::jenkins-slave-1") { role admin }
+}
+
+on route::/ {
+if (auth_server@apcera.me->name == "job::/sandbox/demo::jenkins-slave-1") { role admin }
+}
+
+on provider::/ {
+if (auth_server@apcera.me->name == "job::/sandbox/demo::jenkins-slave-1") { role admin }
+}
+
+on sempiperule::/ {
+if (auth_server@apcera.me->name == "job::/sandbox/demo::jenkins-slave-1") { role admin }
+}
+
+
+
