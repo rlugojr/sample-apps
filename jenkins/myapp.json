@@ -16,7 +16,7 @@
         "EGRESS": {
           "fqn": "service::/apcera::outside"
         },
-        "EGRESS": {
+        "HTTP": {
           "fqn":    "service::/apcera::http"
         }
       },
@@ -46,7 +46,7 @@
         "EGRESS": {
           "fqn": "service::/apcera::outside"
         },
-        "EGRESS": {
+        "HTTP": {
           "fqn":    "service::/apcera::http"
         }
       },
