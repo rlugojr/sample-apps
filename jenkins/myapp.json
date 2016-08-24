@@ -1,0 +1,82 @@
+{
+  "jobs": {
+    "job::/sandbox/demo::jenkins-slave": {
+      "docker": {
+        "image": "apcerademos/jenkins:latest"
+      },
+      "start": {
+        "cmd": "bash /slave.sh",
+        "timeout" : 30
+      },
+      "resources": {
+        "memory": "2GB",
+        "disk_space": "5GB"
+      },
+      "EGRESS": {
+        "fqn": "service::/apcera::outside"
+      },
+      "env": {
+        "target": "http://demo.apcera.net"
+      },
+      "state": "started",
+      "instances": 3
+    },
+    "job::/sandbox/demo::jenkins-master": {
+      "docker":  {
+        "image": "apcerademos/jenkins:latest"
+      },
+      "env": {
+        "target": "http://demo.apcera.net"
+      },
+      "state": "started",
+      "start": {
+        "cmd": "bash /startup.sh",
+        "timeout" : 30
+      },
+      "resources": {
+        "memory": "2GB",
+        "disk_space": "5GB"
+      },
+      "EGRESS": {
+        "fqn": "service::/apcera::outside"
+      },
+      "exposed_ports": [ 8080 ],
+      "routes": [
+        {
+          "type": "http",
+          "endpoint": "jenkins.demo.apcera.net",
+          "config": {
+            "/": [
+              {
+                "weight": 100,
+                "port": 8080
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "networks": {
+    "network::/sandbox/demo::jenkins": {
+      "jobs": [
+        {
+          "fqn": "job::/sandbox/demo::jenkins-master",
+          "discovery_address": "master",
+          "broadcast_enable": true,
+          "multicast_addresses": [
+            "225.1.1.0/24"
+          ]
+        },
+        {
+          "fqn": "job::/sandbox/demo::jenkins-slave",
+          "broadcast_enable": true,
+          "multicast_addresses": [
+            "225.1.1.0/24"
+          ]
+        }
+      ]
+    }
+  }
+
+}
