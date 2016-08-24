@@ -12,8 +12,13 @@
         "memory": "2GB",
         "disk_space": "5GB"
       },
-      "EGRESS": {
-        "fqn": "service::/apcera::outside"
+      "services": {
+        "EGRESS": {
+          "fqn": "service::/apcera::outside"
+        },
+        "EGRESS": {
+          "fqn":    "service::/apcera::http"
+        }
       },
       "env": {
         "target": "http://demo.apcera.net"
@@ -37,8 +42,13 @@
         "memory": "2GB",
         "disk_space": "5GB"
       },
-      "EGRESS": {
-        "fqn": "service::/apcera::outside"
+      "services": {
+        "EGRESS": {
+          "fqn": "service::/apcera::outside"
+        },
+        "EGRESS": {
+          "fqn":    "service::/apcera::http"
+        }
       },
       "exposed_ports": [ 8080 ],
       "routes": [
