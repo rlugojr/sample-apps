@@ -30,11 +30,11 @@ Deploying the application involves modifying some string values in index.js to m
 
         var dockerCreateEndpoint = "http://api.my-cluster.apcera-platform.io/v1/jobs/docker"  
 
-2. Locate the `dockerRequestObject` object and replace `<USER>` in the `job_fqn` field with your user name, e.g.:
+2. Locate the `dockerRequestObject` object and replace `<USER>` in the `job_fqn` field with your user name (`/sandbox/admin`, e.g.):
 
         var dockerRequestObject = `{
           "image_url":"https://registry-1.docker.io/library/nats:latest",
-          "job_fqn":"job::/sandbox/admin::nats",
+          "job_fqn":"job::/sandbox/<USER>::nats",
           "start":true
         }`;
 
@@ -47,7 +47,7 @@ Deploying the application involves modifying some string values in index.js to m
     
         apc service bind /apcera::http --job docker-api-tester
 
-3. Using the Web Console or APC, import the following policy into your cluster, replacing each instance of `<USER>` with your user name (`/sandbox/jsmith`, e.g.):
+3. Using the Web Console or APC, import the following policy into your cluster, replacing each instance of `<USER>` with your user name (`/sandbox/admin`, e.g.):
    
         job::/sandbox/<USER>::docker-api-tester {
             { permit issue }
