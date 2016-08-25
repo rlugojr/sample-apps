@@ -20,7 +20,7 @@
           "fqn":    "service::/apcera::http"
         },
         "NFS": {
-          "fqn": "service::/sandbox/demo::jenkins-master-nfs",
+          "fqn": "service::/sandbox/demo::jenkins-slave-nfs",
           "params": {
             "mountpath": "/root/.jenkins"
           }
