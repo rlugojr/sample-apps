@@ -19,7 +19,7 @@ apc docker create jenkins-master -i my-repo/apcerajenkins -m 2G -d 5G --port 808
 
 - Use APC to create the Jenkins slave job from your Docker registry. Here we need to change the startup command with the -s flag because the slave nodes require a different application to connect to the Jenkins master.
 ```
-apc docker create jenkins-slave -i my-repo/apcerajenkins -m 2G -d 5G --port 8080 -ae -s "bash /slave.sh" -e target="http://demo.apcera.net" --provider  /apcera/providers::apcfs --batch
+apc docker create jenkins-slave -i my-repo/apcerajenkins -m 2G -d 5G --port 8080 -ae -s "bash /slave.sh" -e target="http://demo.apcera.net" --batch
 ```
 
 # Configure the networking
