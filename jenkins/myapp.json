@@ -18,6 +18,12 @@
         },
         "HTTP": {
           "fqn":    "service::/apcera::http"
+        },
+        "NFS": {
+          "fqn": "service::/sandbox/demo::jenkins-master-nfs",
+          "params": {
+            "mountpath": "/root/.jenkins"
+          }
         }
       },
       "env": {
@@ -50,10 +56,10 @@
           "fqn":    "service::/apcera::http"
         },
         "NFS": {
-            "fqn": "service::/sandbox/demo::jenkins-master-nfs",
-            "params": {
-              "mountpath": "/root/.jenkins"
-            }
+          "fqn": "service::/sandbox/demo::jenkins-master-nfs",
+          "params": {
+            "mountpath": "/root/.jenkins"
+          }
         }
       },
       "exposed_ports": [ 8080 ],
@@ -74,10 +80,15 @@
     }
   },
   "services": {
-          "service::/sandbox/demo::jenkins-master-nfs": {
-              "provider_fqn": "provider::/apcera/providers::apcfs"
-          }
-      },
+    "service::/sandbox/demo::jenkins-master-nfs": {
+      "provider_fqn": "provider::/apcera/providers::apcfs"
+    }
+  },
+  "services": {
+    "service::/sandbox/demo::jenkins-slave-nfs": {
+      "provider_fqn": "provider::/apcera/providers::apcfs"
+    }
+  },
   "networks": {
     "network::/sandbox/demo::jenkins": {
       "jobs": [
