@@ -1,4 +1,5 @@
 FROM ubuntu
+VOLUME /root/.jenkins
 USER root
 RUN apt-get update;apt-get install curl wget -y
 RUN curl -o /apc.zip http://api.demo.apcera.net/v1/apc/download/linux_amd64/apc.zip
