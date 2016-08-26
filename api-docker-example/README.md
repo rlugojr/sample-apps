@@ -1,4 +1,4 @@
-# Monitoring App Creation from a Docker image with the Apcera REST API
+# Monitoring App Creation from a Docker image with WebSockets
 
 This sample demonstrates how to use the [POST /v1/jobs/docker](http://docs.apcera.com/api/apcera-api-endpoints/#post-v1jobsdocker) Apcera REST API to create an application from a Docker image and track the progress of the operation using WebSockets. You see this progress information when you run `apc docker run` or `apc docker pull`, for example:
 
@@ -47,25 +47,33 @@ Deploying the application involves modifying some string values in index.js to m
     
         apc service bind /apcera::http --job docker-api-tester
 
-3. Using the Web Console or APC, import the following policy into your cluster, replacing each instance of `<USER>` with your user name (`/sandbox/admin`, e.g.):
+3. Using the Web Console or APC, add the following policy to your cluster, replacing each instance of `<USER>` with your user name (`/sandbox/admin`, e.g.):
    
         job::/sandbox/<USER>::docker-api-tester {
             { permit issue }
         }
-
         job::/sandbox/<USER> {
             if (auth_server@apcera.me->name == "job::/sandbox/<USER>::docker-api-tester") {
                 role admin
             }
-        }
-
+        }        
+        job::/sandbox/<USER> {
+            if (auth_server@apcera.me->name == "job::/sandbox/<USER>::docker-api-tester") {
+                docker.allow "*"
+            }
+        }        
         package::/sandbox/<USER> {
             if (auth_server@apcera.me->name == "job::/sandbox/<USER>::docker-api-tester") {
                 role admin
             }
         }
-        
-    The first policy rule above permits the cluster to issue a token to the application; the second one gives the job admin access over `job` resources in the user's sandbox namespace; lastly, the third rule gives the job admin access over `package` resource in the user's sandbox.
+                    
+    These policy rules do the following:
+    
+    * Permits the cluster to issue a token to the application
+    * Gives the application admin access over `job` resources in the user's sandbox namespace.
+    * Permits the application to create an application in the user's sandbox from any Docker image.
+    * Gives the application admin access over `package` resources in the user's sandbox.
                 
 4. Start the application:
    
