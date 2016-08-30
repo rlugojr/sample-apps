@@ -2,27 +2,31 @@
 
 This sample shows how to create a simple [Bash application](http://docs.apcera.com/packages/staging/#bash) that downloads and installs APC from your cluster, logs in using an [app token](http://docs.apcera.com/jobs/app-token/), and calls `apc job list`. App tokens are issued to a job (by its FQN) rather than to an authenticated user.
 
-The `bash_setup.sh` script (which is executed by the Bash staging pipeline) downloads the APC binary for Linux from the target cluster. The `bash_start.sh` script then uses APC to target and log in to the cluster, and make an APC call.
+The `bash_setup.sh` script (which is executed by the Bash staging pipeline) downloads the APC binary for Linux from the target cluster. The `bash_start.sh` script then uses APC to target and log in to the cluster, and make an APC call to list jobs.
 
 ## Deploy the application
+
+To deploy the sample application you first need to update the bash_setup.sh script to point to your cluster. An environment variable is provided to the application that specifies the target cluster. You also need to add policy to that issues a token to the application, sets the job's default namespace, and assigns necessary permissions for it to be able to manage jobs in the user's sandbox namespace.
+
+**To deploy the application**:
 
 1. Open `bash_setup.sh` in an editor and change the `target` variable to point to your cluster:
     
         # Set the target cluster (e.g. your-cluster.apcera-platform.io):
         export target=your-cluster.example.com
     
-    Save your changes to `bash_setup.sh`.    
+    Save your changes to `bash_setup.sh`.   
     
 3. Open a terminal window and move to the `example-bash-apptoken/` directory.
-4. Create the Bash application, changing the value of the `target` environment variable to point to your cluster (e.g. `--env-set target=your-cluster.apcera-platform.io`):
+4. Create the Bash application  and set the `target` environment variable to point to your cluster (e.g. `--env-set target=your-cluster.apcera-platform.io`):
     
         apc app create example-bash-apptoken \
         --env-set target=your-cluster.example.com --disable-routes --batch
         
     
-    The `--disable-routes` flag is used because the app doesn't listen on any ports/routes. During the staging process, bash_setup.sh is run, which downloads and extracts APC.
+    During the staging process, bash_setup.sh is run, which downloads and extracts APC. The `--disable-routes` flag is used because the app doesn't listen on any ports.
 
-3. Bind the application to the HTTP service (required to use app token):
+3. Bind the application to the HTTP service (required to use app tokens):
     
         apc service bind /apcera::http --job example-bash-apptoken
 
@@ -33,20 +37,21 @@ The `bash_setup.sh` script (which is executed by the Bash staging pipeline) down
             { permit issue }
         }
 
-        // Make job admin over /sandbox/<USER> namespace:
+        // Set default namespace for job to /sandbox/<USER>:
+        auth::/ {
+          if (auth_server@apcera.me->name == "job::/sandbox/<USER>::example-bash-apptoken")
+          {
+            defaultNamespace "/sandbox/<USER>"
+          }
+        }
+
+        // Provide job admin permissions over the /sandbox/<USER> namespace:
         job::/sandbox/<USER> {
             if (auth_server@apcera.me->name == "job::/sandbox/<USER>::example-bash-apptoken") {
                 role admin
             }
         }
 
-        // Set default namespace for job to /sandbox/<USER>:
-        auth::/ {
-          if (auth_server@apcera.me->name == "job::/sandbox/admin::example-bash-apptoken")
-          {
-            defaultNamespace "/sandbox/<USER>"
-          }
-        }    
 
 5. Start the application using APC or the [Web Console](https://docs.apcera.com/quickstart/console_tasks/#starting-and-stopping-jobs):
    
