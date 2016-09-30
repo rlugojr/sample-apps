@@ -7,5 +7,5 @@
   "dependencies": {
     "websocket": "*"
   },
-  "engines": { "node" : "0.8" }
+  "engines": { "node" : "4.4.6" }
 }
