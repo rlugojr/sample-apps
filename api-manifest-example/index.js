@@ -5,12 +5,11 @@ var client = new Client();
 // By default, app uses WebSockets to track progress. To use HTTP polling, add USE_HTTP_POLLING=true as job environment variable
 var useHTTPPolling = process.env.USE_HTTP_POLLING;
 
-// Set cluster to your target cluster name & domain (mycluster.example.com, e.g.)
+// Set to your target cluster name & domain (mycluster.example.com, e.g.)
 var cluster = "kiso.io"
 
 // /v1/manifests endpoint
 var apiEndpoint = "http://api." + cluster + "/v1/manifests"
-
 // The endpoint's POST body is a JSON-encoded multi-resource manifest (http://docs.apcera.com/jobs/multi-resource-manifests)
 var manifestRequestObj = `{
     "jobs": {
@@ -52,7 +51,6 @@ function streamTaskEvents(taskLocation) {
             return;
         }
         if (eventType == "eos") {
-            console.log("Manifest deployed successfully.");
             ws.close();
             return;
         }
@@ -114,7 +112,7 @@ client.post(apiEndpoint, args, function(data, response) {
     switch (response.statusCode) {
         case 200:
             console.log("Got task URI: " + data.location);
-            if (useHTTPPolling) {
+            if (useHTTPPolling == "true") {
                 console.log("Using HTTP polling.")
                 pollTaskStatus(data.location);
             } else {
