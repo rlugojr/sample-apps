@@ -910,3 +910,11 @@ our projects:
 		├── continuum.conf
 		└── pipeline.conf
 ```
+
+This is now availble in the sample applications repository on Apcera's github,
+see https://github.com/apcera/sample-apps/tree/elk-stack.  To copy, simply do:
+
+```code
+git clone https://github.com/apcera/sample-apps.git
+cd example-elks-tack
+```
