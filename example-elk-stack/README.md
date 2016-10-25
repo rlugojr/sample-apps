@@ -2,11 +2,11 @@
 
 ## Customers Want to Analyze their Data
 
-When working with customers we often the same question: "How can I view my logs
-and data".  The answer for this is very easy with the Apcera Platform: enter
-[_Log Drains_](http://docs.apcera.com/tutorials/logdrain/).  Log Drains allow 
-your applications to send their stdout and stderr log messages directly to a 
-syslog service such as Splunk or Papertrail with very little effort.
+When working with customers we often hear the same question: "How can I view my
+logs and data".  The answer for this is very easy with the Apcera Platform:
+enter [_Log Drains_](http://docs.apcera.com/tutorials/logdrain/).  Log Drains
+allow your applications to send their stdout and stderr log messages directly to
+a syslog service such as Splunk or Papertrail with very little effort.
 
 "That is great for production, but is too expensive and time consuming setting
 up accounts for individual developers" is what we basically hear next.
@@ -888,7 +888,7 @@ Hmmm, I am getting a lot of 304's, I wonder if that is OK.
 Starting from scratch we have built and used a complete elk stack, including 
 binding our application directly to our own logstash instance, defining
 our own format.  It even helped me learn something about my application
-(the 304 errors, which I still haven't looked in to).
+(the 304 errors, which I still haven't looked in to, but seems like it is OK).
 
 The patterns don't need to stop there- the platform doesn't care where 
 elasticsearch is- the other components could easily be reconfigured to point
