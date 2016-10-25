@@ -6,9 +6,9 @@ if [ -d /opt/apcera/elasticsearch/bin/shield ]
 then
 	echo "Shield is configured, adding users"
 	cd /opt/apcera/elasticsearch/bin/shield
-	./esusers useradd apcera -r admin -p "apcera-passwd"
-	./esusers useradd kibana -r kibana4_server -p "kibana-passwd"
-	./esusers useradd logstash -r logstash -p "logstash-passwd"
+	./esusers useradd apcera -r admin -p "apcera-password"
+	./esusers useradd kibana -r kibana4_server -p "kibana-password"
+	./esusers useradd logstash -r logstash -p "logstash-password"
 else
 	echo "Shield is not configured, skipping users"
 fi
