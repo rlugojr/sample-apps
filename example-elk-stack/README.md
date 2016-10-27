@@ -50,7 +50,8 @@ once for them to shared across your development team.  This post also
 demonstrates the use of the Elasticsearch shield package, but includes tips for
 omitting it.  If you don't want to follow along you can simply clone the
 accompanying github repo (which may be newer than the article) and move at your
-own pace.  The repo can be found under Apcera's sample-apps (any path references
+own pace.  The repo can be found under Apcera's 
+[sample-apps](https://github.com/apcera/sample-apps) (any path references
 in this article will be relative to that sample-apps/example-elk-stack base to 
 make it easier to follow allong).
 
