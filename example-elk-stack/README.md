@@ -76,7 +76,7 @@ downloading the package from elastic.co's website.  In the `elasticsearch/`
 directory, our package spec(in our case called `elasticsearch-2.4.1.conf`) is:
 
 ```code
-name:		"elasticsearch-2.4.1"
+name:      "elasticsearch-2.4.1"
 version:   "2.4.1"
 namespace: "/apcera/pkg/packages"
 
