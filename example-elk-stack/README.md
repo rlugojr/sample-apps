@@ -165,9 +165,9 @@ the `--disable-routes flag`) then it will fall back to using 9200.  We also
 want to make sure that we store the data under the application directory, so 
 we specify path information.
 
-Creating the package from this manifest is pretty simple:
-
 #### Build the Elastisearch package
+
+Creating the package from this manifest is pretty simple:
 
 ```console
 cd elasticsearch/
@@ -205,7 +205,7 @@ use better passwords):
 
 	start-elasticsearch.sh
 ```
-Again- if you aren't using shield, go ahead and do without the `useradd` lines.
+Again- if you aren't using shield, go ahead and skip the `useradd` lines.
 
 Our [application manifest](http://docs.apcera.com/jobs/manifests/)
 `elasticsearch/sample-app/continuum.conf` sets the default application name as
@@ -228,10 +228,10 @@ resources {
 }
 ```
 
+#### Create the Elasticsearch App
+
 Replacing the domain with one appropriate for our cluster and user, we can now
 deploy and start the application via the following commands:
-
-#### Create the Elasticsearch App
 
 ```bash
 	cd elasticsearch/sample-app/
@@ -321,9 +321,9 @@ fact, it will not funciton without it-- it is a front-end to elasticsearch.  The
 job link URI has a `tcp` scheme, so we change that to http to match the format
 that kibana expects.
 
-Creating the package from this manifest is pretty simple:
-
 #### Build the Kibana package
+
+Creating the package from this manifest is pretty simple:
 
 ```console
 cd kibana/
@@ -470,9 +470,9 @@ Our logstash package is meant to be used in the guise of an application- it only
 makes sense for each individual application to define their own configuration
 for logstash.
 
-Creating the package from this manifest is pretty simple:
-
 #### Build the Logstash package
+
+Creating the package from this manifest is pretty simple:
 
 ```console
 cd logstash/
@@ -832,10 +832,10 @@ We also include an application manifest for our syslogger
 
 ```
 
+#### Deploy the Logstash syslog app
+
 Note that you must replace the x.x.x.x with the IP address of your TCP router.
 We can deploy our syslog app via the following commands:
-
-#### Deploy the Logstash syslog app
 
 ```console
 	cd logstash/syslog-sample-app/
@@ -967,7 +967,7 @@ the next level and incorporate
 #### Directory Layout
 
 When all is said and done, this is what the directory hierarchy looks like for
-our projects:
+our project:
 
 ```code
 ├── README.md (this file)
@@ -983,12 +983,14 @@ our projects:
 │   │   ├── bash_start.sh
 │   │   ├── continuum.conf
 │   └── start-kibana.sh
-└── logstash
-	├── logstash-2.4.0.conf
-	└── syslog-sample-app
-		├── bash_start.sh
-		├── continuum.conf
-		└── pipeline.conf
+├── logstash
+│   ├── logstash-2.4.0.conf
+│   └── syslog-sample-app
+│       ├── bash_start.sh
+│       ├── continuum.conf
+│       └── pipeline.conf
+├── openjdk
+│   └── openjdk-1.8.0-u91-b14.conf
 ```
 
 This is now availble in the sample applications repository on Apcera's github,
