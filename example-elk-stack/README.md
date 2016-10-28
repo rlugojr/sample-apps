@@ -1051,7 +1051,7 @@ if (dependency equals runtime.java-1.8)
 }
 ```
 
-Now that we have taken care of that, jump back to (where you probably 
-were)[#deploy-the-first-application]
+Now that we have taken care of that, jump back to [where you probably 
+were](#deploy-the-first-application)
 
  
