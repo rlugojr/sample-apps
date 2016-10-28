@@ -176,6 +176,14 @@ which will create a package that looks like this:
 
 ![Elasticsearch Package](/example-elk-stack/readme-images/elasticsearch-package.png "Elasticsearch Package")
 
+###### Getting an error?
+> if you get an error building around SSLException related to 
+> InvalidAlgorithmParameterException, then your java might be out of date.  Jump 
+> ahead to (an updated java package build)[#problems-with-keystores] and that
+> should take care of it.  Come back up here, we will be waiting
+
+#### Deploy the first application
+
 To deploy and start the standalone application (in the
 `elasticsearch/sample-app/` directory) we will leverage the bash stager, which
 also allows us to specify the users and passwords that we will be using.  Our
@@ -1041,5 +1049,8 @@ if (dependency equals runtime.java-1.8)
 	package.default "package::/apcera/pkg/runtimes::openjdk-1.8.0-u91-b14"
 }
 ```
+
+Now that we have taken care of that, jump back to (where you probably 
+were)[#deploy-the-first-application]
 
  
