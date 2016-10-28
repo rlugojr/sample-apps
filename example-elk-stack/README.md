@@ -178,10 +178,10 @@ which will create a package that looks like this:
 
 ###### Getting an error?
 
-_If you get an error while building, related to SSLException and
-InvalidAlgorithmParameterException, then your java package might be out of
-date.  Jump ahead to (an updated java package build)[#problems-with-keystores]
-and that should take care of it.  Come back up here, we will be waiting__
+> If you get an error while building, related to SSLException and
+> InvalidAlgorithmParameterException, then your java package might be out of
+> date.  Jump ahead to an updated java package build(#problems-with-keystores)
+> and that should take care of it.  Come back up here, we will be waiting
 
 #### Deploy the first application
 
