@@ -5,8 +5,8 @@
 When working with customers we often hear the same question: "How can I view my
 logs and data".  The answer for this is very easy with the Apcera Platform:
 enter [_Log Drains_](http://docs.apcera.com/tutorials/logdrain/).  Log Drains
-allow your applications to send their stdout and stderr log messages directly to
-a syslog service such as Splunk or Papertrail with very little effort.
+allow your applications to send their `stdout` and `stderr` log messages directly 
+to a syslog service such as Splunk or Papertrail with very little effort.
 
 "That is great for production, but is too expensive and time consuming setting
 up accounts for individual developers" is what we basically hear next.
@@ -21,9 +21,9 @@ The ELK Stack to the rescue!
 
 The ELK stack is primarily composed of three products:
 
-* Elasticsearch
-* Logstash
-* Kibana
+* Elasticsearch -- an open source JSON-based search and analytics engine 
+* Logstash -- an extensible data collection pipeline
+* Kibana -- extensible and powerful analytics interface to Elasticsearch
 
 There are others, but we will be focusing on the core of the stack in this post.
 
@@ -46,14 +46,14 @@ make reusable pieces for our stack. Near the end of the post you will find a
 directory tree so you can see how we stored the pieces in the filesystem.  In
 this article you will see how to set up the packages of the ELK stack, as well
 as how to instantiate a stack for dev use.  You only need to create the packages
-once for them to shared across your development team.  This post also
+once for them to be shared across your development team.  This post also
 demonstrates the use of the Elasticsearch shield package, but includes tips for
 omitting it.  If you don't want to follow along you can simply clone the
 accompanying github repo (which may be newer than the article) and move at your
 own pace.  The repo can be found under Apcera's 
 [sample-apps](https://github.com/apcera/sample-apps) (any path references
 in this article will be relative to that sample-apps/example-elk-stack base to 
-make it easier to follow allong).
+make it easier to follow along).
 
 ```code
 git clone https://github.com/apcera/sample-apps.git
@@ -83,16 +83,16 @@ namespace: "/apcera/pkg/packages"
 
 sources [
   { url: "https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.4.1/elasticsearch-2.4.1.tar.gz",
-	sha1: "6a6acfc7bf7b4354dc6136daea54db1c844d632f" },
+    sha1: "6a6acfc7bf7b4354dc6136daea54db1c844d632f" },
 ]
 
 depends  [ { os: "ubuntu-14.04" },
 			{ runtime: "java-1.8"}
 		 ]
-provides		[ { package: "elasticsearch" },
-				{ package: "elasticsearch-2" },
-				{ package: "elasticsearch-2.4" },
-				{ package: "elasticsearch-2.4.1" }]
+provides      [ { package: "elasticsearch" },
+                { package: "elasticsearch-2" },
+                { package: "elasticsearch-2.4" },
+                { package: "elasticsearch-2.4.1" }]
 
 environment {
 	"PATH": "/opt/apcera/elasticsearch/bin:$PATH"
@@ -103,21 +103,21 @@ include_files [
 	]
 	
 cleanup [
-			"/root"
-		]
+          "/root"
+        ]
 
 build (
 	mkdir -p /opt/apcera
 	tar -C /opt/apcera -xvf elasticsearch-2.4.1.tar.gz
 	chmod a+x start-elasticsearch.sh
 	cp start-elasticsearch.sh /opt/apcera/elasticsearch-2.4.1/bin/.
-	
-	# Install shield also
-	# 
+
+	echo "Installing Shield"
+
 	cd /opt/apcera/elasticsearch-2.4.1
 	./bin/plugin install elasticsearch/license/latest
 	./bin/plugin install elasticsearch/shield/latest
-	
+
 	chown -R runner:runner /opt/apcera/elasticsearch-2.4.1
 	cd /opt/apcera
 	ln -s elasticsearch-2.4.1 elasticsearch
@@ -138,7 +138,7 @@ ownership of the whole tree to `runner`, a predefined user, and sets up a soft
 link to make the paths nicer.
 
 The `environment` section adds `/opt/apcera/elasticsearch/bin` to the path.
-When this package is included in an container, the environment will be updated
+When this package is included in a container, the environment will be updated
 to include this.
 
 If you don't want to include shield, simple omit the two `plugin install` lines.
@@ -162,8 +162,8 @@ To simplfy starting elasticsearch, we create a helper script
 Note the pattern for the port: `HTTP_PORT=${PORT:-9200}`.  If the environment
 variable `PORT` is not set (for example, if an application were deployed with
 the `--disable-routes flag`) then it will fall back to using 9200.  We also
-want to make sure that store the data under the application directory, so we
-specify path information.
+want to make sure that we store the data under the application directory, so 
+we specify path information.
 
 Creating the package from this manifest is pretty simple:
 
@@ -398,50 +398,52 @@ elasticsearch and kibana counterparts, our specification,
 `logstash/logstash-2.4.0.conf`:
 
 ```code
-name:		"logstash-2.4.0"
+# Name
+#	logstash-2.4.0.conf
+#
+# Description
+#   package for logstash
+#
+# Installation
+#   apc package delete /apcera/pkg/packages::logstash-2.4.0 --batch
+#   apc package build logstash-2.4.0.conf --batch
+#
+
+name:      "logstash-2.4.0"
 version:   "2.4.0"
 namespace: "/apcera/pkg/packages"
 
 sources [
   { url: "https://download.elastic.co/logstash/logstash/logstash-2.4.0.tar.gz",
-	sha1: "bce7c753dd19848e29253f706f834d43a74152f8" },
+    sha1: "97314d7b503b966cd4fae13497fdd97d219447ae" },
 ]
 
 depends  [ { os: "ubuntu-14.04" },
 			{ runtime: "java-1.8"}
 		 ]
-provides		[ { package: "logstash" },
-				{ package: "logstash-2" },
-				{ package: "logstash-2.4" },
-				{ package: "logstash-2.4.0" }]
+provides      [ { package: "logstash" },
+                { package: "logstash-2" },
+                { package: "logstash-2.4" },
+                { package: "logstash-2.4.0" }]
 
 environment {
 	"PATH": "/opt/apcera/logstash/bin:$PATH"
 			}
 
-include_files [
-"start-logstash.sh"
-	]
-	
 cleanup [
-			"/root"
-		]
+          "/root"
+        ]
 
 build (
-	chmod a+x start-logstash.sh
-
 	mkdir -p /opt/apcera
 	tar -C /opt/apcera/ -xzf logstash-2.4.0.tar.gz
 
-	cp start-logstash.sh /opt/apcera/logstash-2.4.0/bin/
-
 	cd /opt/apcera/
-	ln -s logstash-2.4.0 logstash
 	cd logstash
 	
 	# Install some plugins
 	#
-	./bin/logstash-plugin install logstash-output-kafka
+	./bin/logstash-plugin install --verbose logstash-output-kafka
 
 	# Update the geo ip data
 	#
@@ -452,7 +454,6 @@ build (
 	cd -
 	chown -R runner:runner logstash-2.4.0/
 )
-
 ```
 
 Note that we have installed a more robust set of IP-to-geography mappings when
@@ -987,3 +988,58 @@ see https://github.com/apcera/sample-apps/tree/elk-stack.  To copy, simply do:
 git clone https://github.com/apcera/sample-apps.git
 cd example-elk-stack
 ```
+
+#### Problems with keystores?
+
+If, when installing or running, you run in to a problem with a keystore that 
+looks like this:
+
+```code
+[staging] Failed: SSLException[java.lang.RuntimeException: Unexpected error: java.security.InvalidAlgorithmParameterException: the trustAnchors parameter must be non-empty]; nested: RuntimeException[Unexpected error: java.security.InvalidAlgorithmParameterException: the trustAnchors parameter must be non-empty]; nested: InvalidAlgorithmParameterException[the trustAnchors parameter must be non-empty];
+```
+
+Then try with a newer version of the openjdk or oraclejdk.  You can find a sample
+java package specification in `openjdk/openjdk-1.8.0-u91-b14.conf`:
+
+```code
+name:      "openjdk-1.8.0-u91-b14"
+version:   "1.8.0"
+namespace: "/apcera/pkg/runtimes"
+
+depends  [ { os: "linux" } ]
+provides [ { runtime: "java" },
+           { runtime: "java-1.8" },
+           { runtime: "java-1.8.0" },
+           { runtime: "java-1.8.0-u91" },
+           { runtime: "java-1.8.0-u91-b14" } ]
+
+environment { "PATH": "/usr/lib/jvm/java-8-openjdk-amd64/bin:$PATH",
+              "JAVA_HOME": "/usr/lib/jvm/java-8-openjdk-amd64" }
+
+build (
+
+	apt-get update
+	apt-get install --yes software-properties-common python-software-properties
+	add-apt-repository --yes ppa:openjdk-r/ppa
+	apt-get update
+	apt-get --yes --no-install-recommends install openjdk-8-jdk=8u91-b14-0ubuntu4~14.04
+)
+```
+
+You build that in the same way you build the ELK stack pieces:
+
+```code
+cd openjdk/
+apc package build openjdk-1.8.0-u91-b14.conf
+```
+
+then add policy to make your package resolution to force that:
+
+```code
+if (dependency equals runtime.java-1.8) 
+{
+	package.default "package::/apcera/pkg/runtimes::openjdk-1.8.0-u91-b14"
+}
+```
+
+ 
