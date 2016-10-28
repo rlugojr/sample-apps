@@ -167,6 +167,8 @@ we specify path information.
 
 Creating the package from this manifest is pretty simple:
 
+#### Build the Elastisearch package
+
 ```console
 cd elasticsearch/
 apc package build elasticsearch-2.4.1.conf
@@ -228,6 +230,8 @@ resources {
 
 Replacing the domain with one appropriate for our cluster and user, we can now
 deploy and start the application via the following commands:
+
+#### Create the Elasticsearch App
 
 ```bash
 	cd elasticsearch/sample-app/
@@ -319,6 +323,8 @@ that kibana expects.
 
 Creating the package from this manifest is pretty simple:
 
+#### Build the Kibana package
+
 ```console
 cd kibana/
 apc package build kibana-4.6.2.conf 
@@ -372,6 +378,8 @@ Finally we can deploy the app as such- note the addition of a job link to
 dynamically bind kibana to its elasticsearch server, and the subsequent start
 command (again replacing the domain):
 
+#### Deploy the Kibana app
+
 ```console
 cd kibana/sample-app/
 
@@ -407,17 +415,6 @@ elasticsearch and kibana counterparts, our specification,
 `logstash/logstash-2.4.0.conf`:
 
 ```code
-# Name
-#	logstash-2.4.0.conf
-#
-# Description
-#   package for logstash
-#
-# Installation
-#   apc package delete /apcera/pkg/packages::logstash-2.4.0 --batch
-#   apc package build logstash-2.4.0.conf --batch
-#
-
 name:      "logstash-2.4.0"
 version:   "2.4.0"
 namespace: "/apcera/pkg/packages"
@@ -474,6 +471,8 @@ makes sense for each individual application to define their own configuration
 for logstash.
 
 Creating the package from this manifest is pretty simple:
+
+#### Build the Logstash package
 
 ```console
 cd logstash/
@@ -836,6 +835,8 @@ We also include an application manifest for our syslogger
 Note that you must replace the x.x.x.x with the IP address of your TCP router.
 We can deploy our syslog app via the following commands:
 
+#### Deploy the Logstash syslog app
+
 ```console
 	cd logstash/syslog-sample-app/
 	
@@ -1052,6 +1053,6 @@ if (dependency equals runtime.java-1.8)
 ```
 
 Now that we have taken care of that, jump back to [where you probably 
-were](#deploy-the-first-application)
+were](#build-the-elastisearch-package)
 
  
