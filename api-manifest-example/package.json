@@ -1,0 +1,10 @@
+{
+  "name": "docker-api-test",
+  "version": "1.0.0",
+  "description": "Sample Node.js that demonstrates deploying a multi-resource manifest and tracking its progress using Apcera REST APIs.",
+  "main": "index.js",
+  "dependencies": {
+    "node-rest-client": "^2.0.1",
+    "ws": "^1.1.1"
+  }
+}
