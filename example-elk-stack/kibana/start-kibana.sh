@@ -1,9 +1,5 @@
-#!/bin/sh
+#!/bin/bash
 
-# It appears that elasticsearch needs two ports, one client port and one 
-# transport port.  the transport port is for clutering.  Might experiment
-# with that later, but for now only dealing with the one
-#
 SERVER_PORT=${PORT:-5601}
 
 if [ -n "$ELASTICSEARCH_URI" ]
@@ -14,4 +10,4 @@ else
 	exit 9
 fi
 
-kibana --elasticsearch.url $ELASTICSEARCH --server.port=${SERVER_PORT} $@
+kibana --elasticsearch $ELASTICSEARCH --port=${SERVER_PORT} --host $(hostname) $@

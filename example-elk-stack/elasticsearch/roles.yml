@@ -1,0 +1,5 @@
+logstash_writer:
+  cluster: [ 'monitor', 'manage_index_templates' ]
+  indices:
+    - names: [ 'logstash-*' ]
+      privileges: [ 'read', 'write', 'create_index' ]

@@ -1,0 +1,7 @@
+xpack:
+  security:
+    authc:
+      realms:
+        file1:
+          type: file
+          order: 0

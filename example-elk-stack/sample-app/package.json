@@ -1,0 +1,17 @@
+{
+  "name": "syslog-writer-app",
+  "version": "1.0.0",
+  "description": "A sample app to write syslog to ELK stack.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.14.0",
+    "morgan": "^1.7.0",
+    "finalhandler": "^0.5.0"
+  }
+}
