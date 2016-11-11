@@ -1215,7 +1215,7 @@ our project:
 │       ├── continuum.conf
 │       └── pipeline.conf
 ├── openjdk
-│   └── openjdk-1.8.0-u91-b14.conf
+│   └── openjdk-1.8.0-ppa.conf
 └── sample-app
     ├── continuum.conf
     ├── package.json
@@ -1240,10 +1240,10 @@ looks like this:
 ```
 
 Then try with a newer version of the openjdk or oraclejdk.  You can find a sample
-openjdk java package specification in `openjdk/openjdk-1.8.0-u91-b14.conf`:
+openjdk java package specification in `openjdk/openjdk-1.8.0-ppa.conf`:
 
 ```code
-name:      "openjdk-1.8.0-u91-b14"
+name:      "openjdk-1.8.0-ppa"
 version:   "1.8.0"
 namespace: "/apcera/pkg/runtimes"
 
@@ -1251,8 +1251,7 @@ depends  [ { os: "linux" } ]
 provides [ { runtime: "java" },
            { runtime: "java-1.8" },
            { runtime: "java-1.8.0" },
-           { runtime: "java-1.8.0-u91" },
-           { runtime: "java-1.8.0-u91-b14" } ]
+           { runtime: "java-1.8.0-ppa" } ]
 
 environment { "PATH": "/usr/lib/jvm/java-8-openjdk-amd64/bin:$PATH",
               "JAVA_HOME": "/usr/lib/jvm/java-8-openjdk-amd64" }
@@ -1262,7 +1261,7 @@ build (
 	apt-get install --yes software-properties-common python-software-properties
 	add-apt-repository --yes ppa:openjdk-r/ppa
 	apt-get update
-	apt-get --yes --no-install-recommends install openjdk-8-jdk=8u91-b14-0ubuntu4~14.04
+	apt-get --yes --no-install-recommends install openjdk-8-jdk
 )
 
 ```
@@ -1271,7 +1270,7 @@ then import the package:
 
 ```console
 cd openjdk/
-apc package build openjdk-1.8.0-u91-b14.conf
+apc package build openjdk-1.8.0-ppa.conf
 ```
 
 then add or update your [package resolution
@@ -1281,7 +1280,7 @@ to have the java-1.8 resolve to the package that we just created:
 ```code
 if (dependency equals runtime.java-1.8) 
 {
-	package.default "package::/apcera/pkg/runtimes::openjdk-1.8.0-u91-b14"
+	package.default "package::/apcera/pkg/runtimes::openjdk-1.8.0-ppa"
 }
 ```
 
