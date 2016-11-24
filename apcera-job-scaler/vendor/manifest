@@ -1,0 +1,88 @@
+{
+	"version": 0,
+	"dependencies": [
+		{
+			"importpath": "github.com/gorilla/websocket",
+			"repository": "https://github.com/gorilla/websocket",
+			"vcs": "git",
+			"revision": "e8f0f8aaa98dfb6586cbdf2978d511e3199a960a",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/howeyc/gopass",
+			"repository": "https://github.com/howeyc/gopass",
+			"vcs": "git",
+			"revision": "f5387c492211eb133053880d23dfae62aa14123d",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/op/go-logging",
+			"repository": "https://github.com/op/go-logging",
+			"vcs": "git",
+			"revision": "970db520ece77730c7e4724c61121037378659d9",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/rthornton128/goncurses",
+			"repository": "https://github.com/rthornton128/goncurses",
+			"vcs": "git",
+			"revision": "ef16d4e36502edc58c45a2c896e00ef8d513dc78",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/satori/go.uuid",
+			"repository": "https://github.com/satori/go.uuid",
+			"vcs": "git",
+			"revision": "b061729afc07e77a8aa4fad0a2fd840958f1942a",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/streamrail/concurrent-map",
+			"repository": "https://github.com/streamrail/concurrent-map",
+			"vcs": "git",
+			"revision": "8bf1e9bacbf65b10c81d0f4314cf2b1ebef728b5",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/ugorji/go/codec",
+			"repository": "https://github.com/ugorji/go",
+			"vcs": "git",
+			"revision": "faddd6128c66c4708f45fdc007f575f75e592a3c",
+			"branch": "master",
+			"path": "/codec",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/crypto/ssh/terminal",
+			"repository": "https://go.googlesource.com/crypto",
+			"vcs": "git",
+			"revision": "ede567c8e044a5913dad1d1af3696d9da953104c",
+			"branch": "master",
+			"path": "/ssh/terminal",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/sys/unix",
+			"repository": "https://go.googlesource.com/sys",
+			"vcs": "git",
+			"revision": "30237cf4eefd639b184d1f2cb77a581ea0be8947",
+			"branch": "master",
+			"path": "/unix",
+			"notests": true
+		},
+		{
+			"importpath": "gopkg.in/beatgammit/turnpike.v2",
+			"repository": "https://gopkg.in/beatgammit/turnpike.v2",
+			"vcs": "git",
+			"revision": "4a4b73895f34dbafb57072896d3f75542dbc684b",
+			"branch": "v2",
+			"notests": true
+		}
+	]
+}
