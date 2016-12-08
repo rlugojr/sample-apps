@@ -50,7 +50,7 @@ func GetJob(jobFQN string) (JSONJob, error) {
 	}
 
 	if len(job) == 0 {
-		return JSONJob{}, fmt.Errorf("Job %v record does not exist")
+		return JSONJob{}, fmt.Errorf("Job %v record does not exist", jobFQN)
 	}
 	return job[0], nil
 }
