@@ -4,17 +4,17 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/apcera/sample-apps/apcera-job-scaler/util"
+	"github.com/apcera/sample-apps/apcera-job-scaler/testutil"
 )
 
 func TestJobSinkStoresOneEvent(t *testing.T) {
-	jobSeqs := [][][]float64{
-		[][]float64{
+	jobSeqs := []testutil.JobsCPUUsage{
+		[]testutil.InstanceCPUUsage{
 			[]float64{.20},
 		},
 	}
 
-	iStates, err := util.GenerateJobCPUEvents(jobSeqs)
+	iStates, err := testutil.GenerateJobCPUEvents(jobSeqs)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -39,12 +39,12 @@ func TestJobSinkStoresOneEvent(t *testing.T) {
 }
 
 func TestJobSinkStoresTwoEvents(t *testing.T) {
-	jobSeqs := [][][]float64{
-		[][]float64{
+	jobSeqs := []testutil.JobsCPUUsage{
+		[]testutil.InstanceCPUUsage{
 			[]float64{.20, .30}},
 	}
 
-	iStates, err := util.GenerateJobCPUEvents(jobSeqs)
+	iStates, err := testutil.GenerateJobCPUEvents(jobSeqs)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -73,14 +73,14 @@ func TestJobSinkStoresTwoEvents(t *testing.T) {
 }
 
 func TestJobSinkWithTwoInstances(t *testing.T) {
-	jobSeqs := [][][]float64{
-		[][]float64{
+	jobSeqs := []testutil.JobsCPUUsage{
+		[]testutil.InstanceCPUUsage{
 			[]float64{.20, .30},
 			[]float64{.40, .40, .40},
 		},
 	}
 
-	iStates, err := util.GenerateJobCPUEvents(jobSeqs)
+	iStates, err := testutil.GenerateJobCPUEvents(jobSeqs)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -119,17 +119,16 @@ func TestJobSinkWithTwoInstances(t *testing.T) {
 }
 
 func TestJobSinkWithTwoJobs(t *testing.T) {
-
-	jobSeqs := [][][]float64{
-		[][]float64{
+	jobSeqs := []testutil.JobsCPUUsage{
+		[]testutil.InstanceCPUUsage{
 			[]float64{.20, .30},
 		},
-		[][]float64{
+		[]testutil.InstanceCPUUsage{
 			[]float64{.40, .40, .40},
 		},
 	}
 
-	iStates, err := util.GenerateJobCPUEvents(jobSeqs)
+	iStates, err := testutil.GenerateJobCPUEvents(jobSeqs)
 	if err != nil {
 		t.Fatal(err)
 	}

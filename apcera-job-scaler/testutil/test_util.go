@@ -1,4 +1,4 @@
-package util
+package testutil
 
 import (
 	"fmt"
@@ -8,29 +8,38 @@ import (
 	"github.com/apcera/sample-apps/apcera-job-scaler/types"
 )
 
+// Behavior generator mocks events for a single instance.
 type BehaviorGenerator interface {
 	Generate() ([]types.InstanceState, error)
 }
 
+// JobConfig describes the behavior of all mock instances for a job.
 type JobConfig struct {
 	Generators []BehaviorGenerator
 }
 
-type MockGeneratorConfig struct {
+// MockEventsGeneratorConfig describes the behavior of all mocked
+// jobs.
+type MockEventsGeneratorConfig struct {
 	JobConfigs []JobConfig
 }
 
-type MockGenerator struct {
-	Config MockGeneratorConfig
+//MockEventsGenerator is used to mock the event stream behavior of
+//multiple jobs.
+type MockEventsGenerator struct {
+	Config MockEventsGeneratorConfig
 }
 
-func NewMockGenerator(config MockGeneratorConfig) *MockGenerator {
-	return &MockGenerator{
+// NewMockEventsGenerator constructs a MockEventsGenerator.
+func NewMockEventsGenerator(config MockEventsGeneratorConfig) *MockEventsGenerator {
+	return &MockEventsGenerator{
 		Config: config,
 	}
 }
 
-func (g *MockGenerator) GenerateMockInstanceData() ([]types.InstanceState, error) {
+// GenerateMockInstanceData generates a slice of InstanceStates
+// according to the specified configuration.
+func (g *MockEventsGenerator) GenerateMockInstanceData() ([]types.InstanceState, error) {
 
 	iStates := []types.InstanceState{}
 
@@ -50,14 +59,18 @@ func (g *MockGenerator) GenerateMockInstanceData() ([]types.InstanceState, error
 	return iStates, nil
 }
 
+// CPUGenerator implements the BehaviorGenerator interface.
 type CPUGenerator struct {
 	config BehaviorGeneratorConfig
 }
 
+// NewCPUGenerator is a constructor for a CPUGenerator.
 func NewCPUGenerator(config BehaviorGeneratorConfig) *CPUGenerator {
 	return &CPUGenerator{config: config}
 }
 
+// BehaviorGeneratorConfig specifies the configuration of the desired
+// behavior for one instance.
 type BehaviorGeneratorConfig struct {
 	CPUSequence  []float64
 	StartTime    time.Time
@@ -67,11 +80,12 @@ type BehaviorGeneratorConfig struct {
 	CPUTotal     float64
 }
 
-// TODO this should probably take a configuration with max mem, max cpu, etc
+// Initialize sets the configuration for CPUGenerator.
 func (g *CPUGenerator) Initialize(config BehaviorGeneratorConfig) {
 	g.config = config
 }
 
+// Generate generates a list of InstanceStates for one mock instance.
 func (g *CPUGenerator) Generate() ([]types.InstanceState, error) {
 	iStates := []types.InstanceState{}
 
@@ -91,6 +105,9 @@ func (g *CPUGenerator) Generate() ([]types.InstanceState, error) {
 	return iStates, nil
 }
 
+// The  following types  are defined  to  allow sorting  of events  by
+// time. This allows the returned slice of InstanceStates to be sorted
+// to simulate a stream of events coming from the cluster.
 type InstanceStateSort []types.InstanceState
 
 func (s InstanceStateSort) Len() int      { return len(s) }
@@ -102,7 +119,24 @@ func (s ByTime) Less(i, j int) bool {
 	return s.InstanceStateSort[i].Timestamp < s.InstanceStateSort[j].Timestamp
 }
 
-func GenerateJobCPUEvents(cpuSeqs [][][]float64) ([]types.InstanceState, error) {
+// JobsCPUusage structure is a triply nested slice. By layer, the
+// structure is:
+//
+// 1. slice of jobs
+// 2. slice of instances per job
+// 3. slice of cpu time-series per instance.
+type JobsCPUUsage []InstanceCPUUsage
+
+// InstancesCPUUsage type is a doubly nested slice. By layer, the
+// structure is:
+//
+// 1. slice of instances per job
+// 2. slice of cpu time-series per instance.
+type InstanceCPUUsage []float64
+
+// GenerateJobCPUevents takes a JobCPUusage  in order to Generate mock
+// CPU time-series for an arbitrary number of jobs and instances.
+func GenerateJobCPUEvents(cpuSeqs []JobsCPUUsage) ([]types.InstanceState, error) {
 	startTime, err := time.Parse("Jan 2, 2006 at 3:04pm (MST)", "Feb 3, 2013 at 7:54pm (PST)")
 	if err != nil {
 		return nil, err
@@ -112,7 +146,7 @@ func GenerateJobCPUEvents(cpuSeqs [][][]float64) ([]types.InstanceState, error) 
 
 	for i, jobSeq := range cpuSeqs {
 		for j, instanceSeq := range jobSeq {
-			genConfig := MockGeneratorConfig{
+			genConfig := MockEventsGeneratorConfig{
 				JobConfigs: []JobConfig{
 					JobConfig{
 						Generators: []BehaviorGenerator{
@@ -129,7 +163,7 @@ func GenerateJobCPUEvents(cpuSeqs [][][]float64) ([]types.InstanceState, error) 
 				},
 			}
 
-			gen := NewMockGenerator(genConfig)
+			gen := NewMockEventsGenerator(genConfig)
 
 			iStates, err := gen.GenerateMockInstanceData()
 			if err != nil {
