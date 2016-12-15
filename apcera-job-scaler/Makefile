@@ -1,6 +1,6 @@
 # Default target: builds the project
 default:
-	go install
+	go install ./...
 
 # Cleans our porject: deletes binaries
 clean:
