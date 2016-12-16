@@ -61,3 +61,13 @@ apc app update jenkins-slave -i 3 --batch
 apc manifest deploy myapp.json -- \
   --CLUSTERNAME $CLUSTERNAME --NAMESPACE $NAMESPACE --NFS_PROVIDER $NFS_PROVIDER
 ```
+
+To use the manifest and the helper script end to end you will need to issue first edit and import the policy then deploy the manifest, here is an example:
+
+```
+apc policy import jenkins.pol
+deploy.sh bagel.buffalo.im /sandbox/juan apcfs-ha
+```
+
+
+
