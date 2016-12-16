@@ -11,7 +11,7 @@ docker build -t my-repo/jenkins .
 docker push my-repo/jenkins
 ```
 
-# Running the Docker image using a script
+# Running the Docker image using the APC CLI
 ## Run the Docker image on Apcera
 - Use APC to create a Jenkins master job from your Docker registry. The -r flag assigns a public route for you to access Jenkins. The envrionment variable "target" should reflect the address of the Apcera cluster. The provider flag sets up persistent storage for the Jenkins directory: /root/.jenkins.
 ```
