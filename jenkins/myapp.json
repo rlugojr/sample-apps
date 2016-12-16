@@ -1,12 +1,12 @@
 {
   "jobs": {
-    "job::/sandbox/demo::jenkins-slave": {
+    "job::${NAMESPACE}::jenkins-slave": {
       "docker": {
         "image": "apcerademos/jenkins:latest"
       },
       "start": {
         "cmd": "bash /slave.sh",
-        "timeout" : 30
+        "timeout" : 120
       },
       "resources": {
         "memory": "2GB",
@@ -20,29 +20,29 @@
           "fqn":    "service::/apcera::http"
         },
         "NFS": {
-          "fqn": "service::/sandbox/demo::jenkins-slave-nfs",
+          "fqn": "service::${NAMESPACE}::jenkins-slave-nfs",
           "params": {
             "mountpath": "/root/.jenkins"
           }
         }
       },
       "env": {
-        "target": "http://demo.apcera.net"
+        "target": "http://jenkins.${CLUSTERNAME}"
       },
       "state": "started",
-      "instances": 3
+      "instances": 1
     },
-    "job::/sandbox/demo::jenkins-master": {
+    "job::${NAMESPACE}::jenkins-master": {
       "docker":  {
         "image": "apcerademos/jenkins:latest"
       },
       "env": {
-        "target": "http://demo.apcera.net"
+        "target": "http://jenkins.${CLUSTERNAME}"
       },
       "state": "started",
       "start": {
         "cmd": "bash /startup.sh",
-        "timeout" : 30
+        "timeout" : 120
       },
       "resources": {
         "memory": "2GB",
@@ -56,7 +56,7 @@
           "fqn":    "service::/apcera::http"
         },
         "NFS": {
-          "fqn": "service::/sandbox/demo::jenkins-master-nfs",
+          "fqn": "service::${NAMESPACE}::jenkins-master-nfs",
           "params": {
             "mountpath": "/root/.jenkins"
           }
@@ -66,7 +66,7 @@
       "routes": [
         {
           "type": "http",
-          "endpoint": "jenkins.demo.apcera.net",
+          "endpoint": "jenkins.${CLUSTERNAME}",
           "config": {
             "/": [
               {
@@ -80,32 +80,24 @@
     }
   },
   "services": {
-    "service::/sandbox/demo::jenkins-master-nfs": {
-      "provider_fqn": "provider::/apcera/providers::apcfs"
+    "service::${NAMESPACE}::jenkins-master-nfs": {
+      "provider_fqn": "provider::/apcera/providers::${NFS_PROVIDER}"
     }
   },
   "services": {
-    "service::/sandbox/demo::jenkins-slave-nfs": {
-      "provider_fqn": "provider::/apcera/providers::apcfs"
+    "service::${NAMESPACE}::jenkins-slave-nfs": {
+      "provider_fqn": "provider::/apcera/providers::${NFS_PROVIDER}"
     }
   },
   "networks": {
-    "network::/sandbox/demo::jenkins": {
+    "network::${NAMESPACE}::jenkins": {
       "jobs": [
         {
-          "fqn": "job::/sandbox/demo::jenkins-master",
-          "discovery_address": "master",
-          "broadcast_enable": true,
-          "multicast_addresses": [
-            "225.1.1.0/24"
-          ]
+          "fqn": "job::${NAMESPACE}::jenkins-master",
+          "discovery_address": "master"
         },
         {
-          "fqn": "job::/sandbox/demo::jenkins-slave",
-          "broadcast_enable": true,
-          "multicast_addresses": [
-            "225.1.1.0/24"
-          ]
+          "fqn": "job::${NAMESPACE}::jenkins-slave"
         }
       ]
     }
