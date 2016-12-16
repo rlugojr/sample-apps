@@ -68,3 +68,5 @@ To use the manifest and the helper script end to end you will need to issue firs
 apc policy import jenkins.pol
 deploy.sh bagel.buffalo.im /sandbox/juan apcfs-ha
 ```
+For more information on multi-resource manifests see: http://docs.apcera.com/jobs/multi-resource-manifests/
+
