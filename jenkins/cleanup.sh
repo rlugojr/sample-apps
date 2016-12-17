@@ -1,15 +1,17 @@
 #!/bin/bash
 #
+# This scripts cleans up the objects creatd by the deploy of jenkins-manifest.json
+#
 
+echo "Deleting jobs ..."
 apc job delete --batch jenkins-master
 apc job delete --batch jenkins-slave
 
+echo "Deleting services ..."
 apc service delete --batch jenkins-slave-nfs
 apc service delete --batch jenkins-master-nfs
 
-apc network delete --batch jenkins
+echo "Deleting network ..."
+apc network delete jenkins-network
 
-apc package delete --batch jenkins-master
-apc package delete --batch jenkins-slave
-
-apc network delete jenkins
+echo "Done"
