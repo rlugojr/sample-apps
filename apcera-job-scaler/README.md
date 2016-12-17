@@ -6,7 +6,7 @@ The auto-scaler application has been tested to work with Apcera Platform version
 
 ## Scaling behavior
 
-When the auto-scaler application starts it reads its [configuration](#options) from the environment. It uses the [Events System API](http://docs.apcera.com/api/events-system-api/) to subscribe events for the job specified by the `$TARGET_JOB` environment variable. The Event Server publishes an [instance resource usage event](http://docs.apcera.com/api/event-object-reference/#instance-metric-events) every 10 seconds for each instance of the target job. Each resource usage event contains the instance's current CPU usage and its total CPU reservation.
+When the auto-scaler application starts it reads its [configuration](#auto-scaler-configuration-options) from the environment. It uses the [Events System API](http://docs.apcera.com/api/events-system-api/) to subscribe events for the job specified by the `$TARGET_JOB` environment variable. The Event Server publishes an [instance resource usage event](http://docs.apcera.com/api/event-object-reference/#instance-metric-events) every 10 seconds for each instance of the target job. Each resource usage event contains the instance's current CPU usage and its total CPU reservation.
 
 The auto-scaler collects usage events for the number of seconds specified by the `$SCALING_FREQ` environment variable. At the end of this period the auto-scaler computes the target job's average (arithmetic mean) CPU usage across all instances. Specifically, CPU usage is calculated as the arithmetic mean CPU usage for each individual instance of `$TARGET_JOB`, and then again the arithmetic mean of CPU utilization across all the instances of `$TARGET_JOB`. It then takes one of the following actions:
 
@@ -67,7 +67,7 @@ The Apcera Job Auto-Scaler application is composed of the following components: 
 
 ![scaler](architecture.png)
 
-### Tutorial
+## Tutorial
 
 This tutorial shows how to configure the auto-scaler app to monitor another application. The target app that you'll monitor is a simple Go application (example-go) that waits for incoming HTTP requests on a port and returns a string. You'll deploy the Go app with three instances. You'll then deploy an instance of the auto-scaler app that's configured to monitor and scale the Go app.
 
@@ -109,7 +109,7 @@ When the Go app is not handling any HTTP requests its CPU usage will be negligib
 
     * Replace `<cluster.domain>` in the `API_ENDPOINT` variable to your cluster's API Server URI (`api.example.com`, for example).
     * Set the `TARGET_JOB` to the FQN of the example-go app you deployed previously (`job::/sandbox/admin::example-go`, for example).
-    * Leave the other [configuration options](#options) at their default values, or set them to the desired values.
+    * Leave the other [configuration options](#auto-scaler-configuration-options) at their default values, or set them to the desired values.
 
 4. Create the auto-scaler app.
 
