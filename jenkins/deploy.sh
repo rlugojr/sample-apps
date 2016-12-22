@@ -47,5 +47,5 @@ if [ ${RET} -ne 0 ]; then
     exit 1
 fi
 
-apc manifest deploy myapp.json -- \
+apc manifest deploy jenkins-manifest.json -- \
   --CLUSTERNAME $CLUSTERNAME --NAMESPACE $NAMESPACE --NFS_PROVIDER $NFS_PROVIDER

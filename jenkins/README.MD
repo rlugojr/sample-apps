@@ -55,10 +55,10 @@ apc app update jenkins-slave -i 3 --batch
 ```
 
 # Using Multi-Resource Manifest
-The with the multi-resource manifest you can establish a single descriptive declarative file that can deploy the whole application, including adding both jobs, services, network, routes, and in a single command deploys the application end-to-end. The file, myapp.json includes variables so it is portable. Please see the file deploy.sh for details, it executes this command at the end:
+The with the multi-resource manifest you can establish a single descriptive declarative file that can deploy the whole application, including adding both jobs, services, network, routes, and in a single command deploys the application end-to-end. The file, jenkins-manifest.json includes variables so it is portable. Please see the file deploy.sh for details, it executes this command at the end:
 
 ```
-apc manifest deploy myapp.json -- \
+apc manifest deploy jenkins-manifest.json -- \
   --CLUSTERNAME $CLUSTERNAME --NAMESPACE $NAMESPACE --NFS_PROVIDER $NFS_PROVIDER
 ```
 
@@ -70,3 +70,13 @@ deploy.sh bagel.buffalo.im /sandbox/juan apcfs-ha
 ```
 For more information on multi-resource manifests see: http://docs.apcera.com/jobs/multi-resource-manifests/
 
+# Jenkins CLI
+
+To use the Jenkins CLI with the Apcera platform, the easiest mechanism is to connect to the container running jenkins then execute it inside the container.
+So, for example to list the plugins installed in the jenkins plugin, do the following:
+
+```
+apc job connect jenkins-master
+root@ip-169-254-0-1:/root# java -jar /root/.jenkins/war/WEB-INF/jenkins-cli.jar -s http://127.0.0.1:8080/ list-plugins
+... etc ...
+```
