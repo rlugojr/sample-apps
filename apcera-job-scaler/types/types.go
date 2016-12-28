@@ -1,8 +1,8 @@
 package types
 
 type NetUsage struct {
-	TxBytes int64 `json:",omitempty"`
-	RxBytes int64 `json:",omitempty"`
+	TxBytes float64 `json:",omitempty"`
+	RxBytes float64 `json:",omitempty"`
 }
 
 // InstanceState defines the payload of an instance metric event.
