@@ -41,6 +41,13 @@ if [ ${RESTART} == 'true' ]; then
     java -jar /root/.jenkins/war/WEB-INF/jenkins-cli.jar -s http://127.0.0.1:8080/ restart
 fi
 
+# Apcera apc CLI
+route=`echo $TARGET | cut -d '/' -f3`
+wget https://api.${route}/v1/apc/download/linux_amd64/apc.zip
+unzip apc.zip -d /usr/local/bin
+apc target $TARGET
+apc login --app-auth
+
 echo "$0: Sleeping forever ...";echo
 while kill -0 `pidof java` ; do
   sleep 1
