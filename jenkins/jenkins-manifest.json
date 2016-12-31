@@ -2,7 +2,7 @@
   "jobs": {
     "job::${NAMESPACE}::jenkins-slave": {
       "docker": {
-        "image": "apcerademos/jenkins:test"
+        "image": "apcerademos/jenkins:latest"
       },
       "start": {
         "cmd": "bash /slave.sh",
@@ -34,7 +34,7 @@
     },
     "job::${NAMESPACE}::jenkins-master": {
       "docker":  {
-        "image": "apcerademos/jenkins:test"
+        "image": "apcerademos/jenkins:latest"
       },
       "env": {
         "TARGET": "http://${CLUSTERNAME}"
