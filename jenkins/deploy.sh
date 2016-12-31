@@ -33,7 +33,7 @@ else
 fi
 
 
-apc target https://$CLUSTERNAME
+apc target $CLUSTERNAME
 RET=$?
 if [ ${RET} -ne 0 ]; then
     print_usage
