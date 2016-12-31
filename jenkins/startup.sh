@@ -41,11 +41,7 @@ if [ ${RESTART} == 'true' ]; then
     java -jar /root/.jenkins/war/WEB-INF/jenkins-cli.jar -s http://127.0.0.1:8080/ restart
 fi
 
-# initializing apc target
-apc target $TARGET
-apc login --app-auth
-
-echo "$0: Sleeping forever.....";echo
+echo "$0: Sleeping forever ...";echo
 while kill -0 `pidof java` ; do
   sleep 1
 done
