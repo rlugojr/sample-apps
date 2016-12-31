@@ -20,14 +20,14 @@
           "fqn":    "service::/apcera::http"
         },
         "NFS": {
-          "fqn": "service::${NAMESPACE}::jenkins-slave-nfs",
+          "fqn": "service::${NAMESPACE}::jenkins-master-nfs",
           "params": {
             "mountpath": "/root/.jenkins"
           }
         }
       },
       "env": {
-        "TARGET": "http://jenkins.${CLUSTERNAME}"
+        "TARGET": "http://${CLUSTERNAME}"
       },
       "state": "started",
       "instances": 1
@@ -37,7 +37,7 @@
         "image": "apcerademos/jenkins:latest"
       },
       "env": {
-        "TARGET": "http://jenkins.${CLUSTERNAME}"
+        "TARGET": "http://${CLUSTERNAME}"
       },
       "state": "started",
       "start": {
@@ -81,11 +81,6 @@
   },
   "services": {
     "service::${NAMESPACE}::jenkins-master-nfs": {
-      "provider_fqn": "provider::/apcera/providers::${NFS_PROVIDER}"
-    }
-  },
-  "services": {
-    "service::${NAMESPACE}::jenkins-slave-nfs": {
       "provider_fqn": "provider::/apcera/providers::${NFS_PROVIDER}"
     }
   },
