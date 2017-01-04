@@ -1,7 +1,7 @@
 ## Apcera Job Auto-scaler Application
 
 The Apcera Job Auto-scaler application demonstrates how to monitor, analyze and scale the number of running instances of another job based on that job's CPU usage. The auto-scaler uses the uses the [Events System API](http://docs.apcera.com/api/events-system-api/) to subscribe to a stream of resource usage metrics for a target job you specify by FQN. The auto-scaler app collects and stores usage CPU metrics over a time window you specify and computes the average CPU usage across all job instances.
-If the computed CPU usage rises above (or falls below) a percentage of the total available CPU that you specify, the auto-scaler uses the [Apcera REST API](https://docs.apcera.com/api/apcera-api-endpoints/#put-v1jobsuuid) to increase (or decrease) the number of job instances, as necessary.
+If the computed CPU usage rises above (or falls below) a percentage of the total available CPU that you specify, the auto-scaler uses the [Apcera REST API](https://docs.apcera.com/api/apcera-api-endpoints/#put-v1jobsuuid) to increase or decrease the number of job instances, as necessary.
 
 The auto-scaler application has been tested to work with Apcera Platform version 2.4.0 and above.
 
@@ -17,9 +17,44 @@ At the end of the time period specified by the `$SCALING_FREQ` environment varia
 
 Logs from the auto-scaler app are forwarded to **stderr**.
 
+## Requirements
+
+To use the auto-scaler application the following conditions must be met:
+
+* [Policy](#requiredpolicy) must exist that issues an app token to the auto-scaler, and gives it permission to read/update properties of the target application.
+* [CPU reservation](#cpureserve) must be set on the target application to monitor.
+
+### Required policy
+
+For the auto-scaler to function you must add policy to your cluster that issues an application token to the auto-scaler application, and that permits the auto-scaler to read and update properties on the target job. To do this you must have permissions to add/edit policy on your cluster (see [Policy authoring permissions](http://docs.apcera.com/policy/permissions/#policy-authoring-permissions)).
+
+For example, suppose you've deployed the auto-scaler to `job::/sandbox/admin::apcera-job-scaler` and it is [configured](#options) to monitor the application at `job::/prod::my-app`. In this case, the following policy would be required:
+
+    // Permit token to be issued to job-scaler app
+    on job::/sandbox/admin::apcera-job-scaler {
+        {permit issue}
+    }
+
+    // Permit job-scaler app to read and update properties of the target app
+    on job::/prod::my-app {
+        if (auth_server@apcera.me->name == "job::/sandbox/admin::apcera-job-scaler") {
+            permit read, update
+        }
+    }
+
+### Setting CPU reservation on target job {#cpureserve}
+
+For the auto-scaler calculate CPU usage, you must assign a CPU reservation to the app you want to monitor. (By default, applications are provided with unlimited CPU time.) For example, the following command creates a new application and reserves 200 milliseconds of CPU time per second of physical time for the target app:
+
+    apc app create my-app --cpus 200
+
+Or to update an existing job's CPU reservation:
+
+    apc app update my-app --cpus 200
+
 ## Configuring and deploying the Auto-scaler {#options}
 
-The auto-scaler app's behavior is configured by the following environment variables that you set on the application.
+The auto-scaler app's behavior is configured by the following environment variables that it reads from its enviroinment.
 
 | Environment variable name | Description                                                                                                           | Default value |
 | ------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------- |
@@ -37,7 +72,7 @@ The easy way to deploy and configure the auto-scaler is with the provided applic
     # App Environment Variables;
     env {
        "API_ENDPOINT": "api.<cluster.domain>",
-       "TARGET_JOB": "job::/<your>/<namespace>::example-go",
+       "TARGET_JOB": "job::/<your>/<namespace>::<your-app>",
        "SCALING_FREQ": "30",
        "CPU_ROOF": "80",
        "CPU_FLOOR": "20",
@@ -52,33 +87,13 @@ Make the following changes to the environment variables:
 * Set the `TARGET_JOB` to the FQN of the example-go app you deployed previously (`job::/sandbox/admin::example-go`, for example). You **must** set a CPU reservation on the target job for the auto-scaler to compute CPU usage. See [Setting CPU reservation](#cpureserve).
 * Leave the other [configuration options](#options) at their default values, or set them to the desired values.
 
-Deploy the app using your modified app manifest:
+Run the `apc app create` command to deploy the auto-scalcer using the modified app manifest run
 
+    cd sample-apps/apcera-job-scaler
     apc app create
 
-You also need to add policy to permit the auto-scaler to make authenticated API calls to read and update properties on `TARGET_JOB`. See [Required policy](#requiredpolicy).
+You also need to add policy to permit the auto-scaler to make authenticated API calls to read and update properties on `TARGET_JOB`. See [Required policy]().
 
-### Required policy
-
-You must also add policy to your cluster that issues an application token to the auto-scaler application, and that also permits the auto-scaler app to read and update properties on the target job. For example, suppose you've deployed the auto-scaler to `job::/sandbox/admin::apcera-job-scaler`, and it is configured to monitor the application at `job::/prod::my-app`. In this case, you would need the following policy that permits a token to be issued to the auto-scaler app:
-
-    on job::/sandbox/admin::apcera-job-scaler {
-        {permit issue}
-    }
-
-Also, you must add policy that gives the auto-scaler app permission to read and update properties on the target job, for example:
-
-    on job::/prod::my-app {
-        if (auth_server@apcera.me->name == "job::/sandbox/admin::apcera-job-scaler") {
-            permit read, update
-        }
-    }
-
-### Setting CPU reservation on target job {#cpureserve}
-
-For the auto-scaler app to calculate an instance's CPU usage you must assign an explicit CPU reservation to the app you want to monitor. (By default, applications on Apcera are provided with unlimited CPU time.) For example, the following command creates a new application and reserves 200 milliseconds of CPU time per second of physical time for the target app:
-
-    apc app create app-to-monitor --cpus 200
 
 ## Auto-scaler application design
 
@@ -86,18 +101,18 @@ The auto-scaler application is composed of the following components: Job Monitor
 
 * Job Monitor -- Subscribes to events for the target job using the [Apcera Events System API](https://docs.apcera.com/api/events-system-api/). It saves metric event records to the Job Sink.
 * Job Sink -- Stores and aggregates the metric data obtained for the target job for the latest time window specified by the `$SCALING_FREQ` parameter.
-* Job Metric Calculator -- Acts as decorator to the information being stored in Job Sink. It provides the algorithms for calculating resource utilization summaries for requested jobs. Currently, it only calculates CPU usage.
+* Job Metric Calculator -- Acts as decorator to the information begin stored in Job Sink. It provides the algorithms for calculating resource utilization summaries for requested jobs. Currently, it only calculates CPU usage.
 * Job Scaler -- Provides the primary application logic for scaling the target job's instance count up or down.
 
 ![scaler](architecture.png)
 
 ## Tutorial
 
-This tutorial shows how to configure the auto-scaler app to monitor another application. For the target app to monitor, you'll deploy a simple Go app (example-go) that waits for incoming HTTP requests on a port and returns a string. You'll then deploy an instance of the auto-scaler app that's configured to monitor and scale the Go app.
+This tutorial shows how to configure the auto-scaler app to monitor another application. For the target app to monitor, you'll deploy a simple Go app that listens for incoming HTTP requests on a port and returns a string. You'll then deploy an instance of the auto-scaler app that's configured to monitor and scale the Go app.
 
-When the target app is not handling any HTTP requests its CPU usage will be negligible, and the auto-scaler will fall below the `$CPU_FLOOR` configuration parameter. In response, the auto-scaler will reduce the number of app instances instances after each scaling period until the `$MIN_INSTANCES` count is reached.
+When the target app is not handling any HTTP requests its CPU usage will be negligible, and the auto-scaler will fall below the value specified by the `$CPU_FLOOR` configuration parameter. In response, the auto-scaler will reduce the number of app instances after each scaling period until the `$MIN_INSTANCES` count is reached.
 
-If the Go app were to receive lots of HTTP requests at once, and the calculated CPU usage increased above the `CPU_ROOF` value, then the number of instances would be increased.
+If the Go app were to receive a spike in HTTP requests, and the calculated CPU usage increased above the `CPU_ROOF` value, then the number of instances would be increased.
 
 **To deploy and configure auto-scaler**:
 
@@ -145,34 +160,15 @@ If the Go app were to receive lots of HTTP requests at once, and the calculated 
 
 5. Add the [required policy](#requiredpolicy) to your cluster. Change the namespaces (`/sandbox/admin` in the example below) to match the one where you deployed the `apcera-job-scaler` and `example-go` apps:
 
-        // Permit token to be issued to job-scaler app
         on job::/sandbox/admin::apcera-job-scaler {
             {permit issue}
         }
 
-        // Permit job-scaler app to read and update the target app's FQN
         on job::/sandbox/admin::example-go {
             if (auth_server@apcera.me->name == "job::/sandbox/admin::apcera-job-scaler") {
                 permit read, update
             }
         }
-
-5. Start the auto-scaler application. Note that the auto-scaler logs its configuration settings to STDOUT:
-
-        apc app start apcera-job-scaler
-
-        Starting job... done
-        Waiting for the job to start...
-        [stderr][63c17f0a] 2016/12/19 22:57:06 Enabling job::/sandbox/admin::example-go for auto scaling
-        [stdout][63c17f0a] Scaling Job Config set...
-        [stdout][63c17f0a] FQN:  job::/sandbox/admin::example-go
-        [stdout][63c17f0a] Scaling Frequency:  30s
-        [stdout][63c17f0a] Lower CPU limit:  20
-        [stdout][63c17f0a] Upper CPU limit:  80
-        [stdout][63c17f0a] Minimum Instance limit:  1
-        [stdout][63c17f0a] Maximum Instance limit:  20
-        [stdout][63c17f0a] No. of Instances to be added/removed when scaling behavior triggered:  1
-        Success!
 
 6. View the auto-scaler logs using APC or the Web Console:
 
@@ -213,7 +209,7 @@ If the Go app were to receive lots of HTTP requests at once, and the calculated 
         [stderr][b44ca45d] 2016/12/19 23:08:13 Minimum number of instances that could be scaled down to is  1
 
 
-    Conversely, if something caused the target app's CPU usage to increase above 80% (our specified `$CPU_ROOF` value) then the auto-scaler would being to increase the number of instances in the same manner.
+    Conversely, if something caused the target app's CPU usage to increase above 80% (our specified `$CPU_ROOF` value) then the auto-scaler would begin to increase the number of instances in the same manner.
 
         [stderr] 2016/12/20 00:29:57 Total of 1 metrics gathered for instance c3b19d8a-8989-4ff2-82c8-c9d3b6b39a70 of Job job::/sandbox/admin::example-go in the current window.
         [stderr] 2016/12/20 00:30:07 Total of 2 metrics gathered for instance c3b19d8a-8989-4ff2-82c8-c9d3b6b39a70 of Job job::/sandbox/admin::example-go in the current window.
@@ -232,7 +228,7 @@ If the Go app were to receive lots of HTTP requests at once, and the calculated 
 
 Below are some common issues you may encounter when deploying or using the auto-scaler app.
 
-* **"Job metrics not reported yet."** -- This message appears if you didn't add policy to allow the auto-scaler app to read and update the target job's properties. See [Required Policy](#requiredpolicy). Also, make sure you started the target app.
 * **"Failed joining the Event Server realm %!!(MISSING)(EXTRA string=com.apcera.api"** -- This error occurs if your cluster is missing policy that issues an API token to the auto-scaler app. See [Required Policy](#requiredpolicy).
+* **"Job metrics not reported yet."** -- This message appears if you didn't add policy to allow the auto-scaler app to read and update the target job's properties. See [Required Policy](#requiredpolicy). Also make sure the target app is running.
 
 
