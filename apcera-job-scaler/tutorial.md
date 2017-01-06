@@ -1,6 +1,6 @@
 ## Auto-scaler app tutorial
 
-This tutorial demonstrates how to use the [Apcera Job Auto-Scaler](https://github.com/apcera/sample-apps/blob/job-scaler-readme-updates/apcera-job-scaler/README.md){: target="_blank"} application to auto-scale an application. The target you'll monitor is  a simple web server that listens for incoming HTTP requests and returns a string. You'll initially deploy multiple instances of the application. When the target app is not handling any HTTP requests its CPU usage will be negligible, and the auto-scaler will reduce the number of app instances until the `$MIN_INSTANCES` count is reached.
+This tutorial demonstrates how to use the [Apcera Job Auto-Scaler](https://github.com/apcera/sample-apps/blob/job-scaler-readme-updates/apcera-job-scaler/README.md) application to auto-scale an application. The target you'll monitor is  a simple web server that listens for incoming HTTP requests and returns a string. You'll initially deploy multiple instances of the application. When the target app is not handling any HTTP requests its CPU usage will be negligible, and the auto-scaler will reduce the number of app instances until the `$MIN_INSTANCES` count is reached.
 
 If the web server app were to receive a spike in HTTP requests, and the calculated CPU usage increased above the specified `CPU_ROOF` value, then the number of instances would be increased until `$MAX_INSTANCES` is reached.
 
