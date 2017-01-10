@@ -2,8 +2,13 @@
 
 var autobahn = require('autobahn');
 
+// Work-around for docs.apcera.com/api/events-system-api/#wamp-compat
+autobahn.Session.prototype.resolve = function(value) {
+    return value
+}
+
 // WAMP subscription topic FQN. Your API token must allow read access to this resource.
-var subscribeFQN = encodeURIComponent("job::/apcera");
+var subscribeFQN = "job::/apcera";
 
 // Read API token from environment. Required for running outside the cluster.
 var token = process.env.BEARER_TOKEN;
