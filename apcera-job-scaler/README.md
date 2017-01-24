@@ -1,28 +1,17 @@
 ## Apcera Job Auto-scaler Application
 
-The Apcera Job Auto-scaler application demonstrates how to monitor, analyze and scale the number of running instances of another job based on that job's CPU usage. The auto-scaler uses the uses the [Events System API](http://docs.apcera.com/api/events-system-api/) to subscribe to a stream of resource usage metrics for a target job you specify by FQN. The auto-scaler app collects and stores usage CPU metrics over a time window you specify and computes the average CPU usage across all job instances.
+The Apcera Job Auto-scaler application demonstrates how to monitor, analyze and scale the number of running instances of another job based on that job's CPU usage. The auto-scaler uses the [Events System API](http://docs.apcera.com/api/events-system-api/) to subscribe to a stream of resource usage metrics for a target job you specify by FQN. The auto-scaler app collects and stores usage CPU metrics over a time window you specify and computes the average CPU usage across all job instances.
 If the computed CPU usage rises above (or falls below) a percentage of the total available CPU that you specify, the auto-scaler uses the [Apcera REST API](https://docs.apcera.com/api/apcera-api-endpoints/#put-v1jobsuuid) to increase or decrease the number of job instances, as necessary.
 
 The auto-scaler application has been tested to work with Apcera Platform version 2.4.0 and above.
 
 See the [tutorial](tutorial.md) that demonstrates how to use and configure the auto-scaler application.
 
-## Auto-scaler application behavior
-
-When the auto-scaler application starts up it reads its [configuration](#options) from the environment. It then subscribes to resource usage events for the job specified by the `$TARGET_JOB` environment variable. The Event Server publishes an [instance resource usage event](http://docs.apcera.com/api/event-object-reference/#instance-metric-events) every 10 seconds for each instance of the target job. Each usage event contains the instance's current CPU usage and its total CPU reservation.
-
-At the end of the time period specified by the `$SCALING_FREQ` environment variable, the auto-scaler computes the target job's average (arithmetic mean) CPU usage across all instances. CPU usage is calculated as the arithmetic mean CPU usage for each individual instance of `$TARGET_JOB`, and then again the arithmetic mean of CPU utilization across all the instances of `$TARGET_JOB`. Based on this calculation it does one of the following:
-
-- If the computed CPU usage is greater than `$CPU_ROOF`, and the total number of instances is not greater than `$MAX_INSTANCES`, it increases the number of instances of `$TARGET_JOB` by `$INSTANCE_COUNTER`.
-- If the computed CPU usage is less than `$CPU_FLOOR`, and the total number of instances is not less than `$MIN_INSTANCES`, it decreases the number of instances of `$TARGET_JOB` by `$INSTANCE_COUNTER`.
-- Otherwise, no action is taken on the target job.
-
-Logs from the auto-scaler app are forwarded to **stderr**.
-
 ## Requirements
 
 To use the auto-scaler application the following conditions must be met:
 
+* Apcera cluster must be configured to use HTTPS. The auto-scaler authenticates with the cluster using [app tokens](http://docs.apcera.com/jobs/app-token/#requirements), a feature that depends on HTTPS.
 * [Policy](#requiredpolicy) must exist that issues an app token to the auto-scaler, and gives it permission to read/update properties of the target application.
 * [CPU reservation](#cpureserve) must be set on the target application to monitor.
 
@@ -96,8 +85,7 @@ Run the `apc app create` command to deploy the auto-scalcer using the modified a
 
 You also need to add policy to permit the auto-scaler to make authenticated API calls to read and update properties on `TARGET_JOB`. See [Required policy]().
 
-
-## Auto-scaler application design
+## Auto-scaler application design and behavior
 
 The auto-scaler application is composed of the following components: Job Monitor, Job Sink, Job Metric Calculator, and Job Scaler itself.
 
@@ -108,11 +96,22 @@ The auto-scaler application is composed of the following components: Job Monitor
 
 ![scaler](architecture.png)
 
+When the auto-scaler application starts up it reads its [configuration](#options) from the environment. It then subscribes to resource usage events for the job specified by the `$TARGET_JOB` environment variable. The Event Server publishes an [instance resource usage event](http://docs.apcera.com/api/event-object-reference/#instance-metric-events) every 10 seconds for each instance of the target job. Each usage event contains the instance's current CPU usage and its total CPU reservation.
+
+At the end of the time period specified by the `$SCALING_FREQ` environment variable, the auto-scaler computes the target job's average (arithmetic mean) CPU usage across all instances. CPU usage is calculated as the arithmetic mean CPU usage for each individual instance of `$TARGET_JOB`, and then again the arithmetic mean of CPU utilization across all the instances of `$TARGET_JOB`. Based on this calculation it does one of the following:
+
+- If the computed CPU usage is greater than `$CPU_ROOF`, and the total number of instances is not greater than `$MAX_INSTANCES`, it increases the number of instances of `$TARGET_JOB` by `$INSTANCE_COUNTER`.
+- If the computed CPU usage is less than `$CPU_FLOOR`, and the total number of instances is not less than `$MIN_INSTANCES`, it decreases the number of instances of `$TARGET_JOB` by `$INSTANCE_COUNTER`.
+- Otherwise, no action is taken on the target job.
+
+Logs from the auto-scaler app are forwarded to **stderr**.
+
+
 ## Troubleshooting
 
 Below are some common issues you may encounter when deploying or using the auto-scaler app.
 
-* **"Failed joining the Event Server realm %!!(MISSING)(EXTRA string=com.apcera.api"** -- This error occurs if your cluster is missing policy that issues an API token to the auto-scaler app. See [Required Policy](#requiredpolicy).
+* **"Failed joining the Event Server realm %!!(MISSING)(EXTRA string=com.apcera.api"** -- This error can indicate that your cluster is missing required policy to issue an API token to the auto-scaler app. See [Required Policy](#requiredpolicy). Also make sure you your cluster is configured to use HTTPS, which is required for app tokens to function.
 * **"Job metrics not reported yet."** -- This message appears if you didn't add policy to allow the auto-scaler app to read and update the target job's properties. See [Required Policy](#requiredpolicy). Also make sure the target app is running.
 
 
