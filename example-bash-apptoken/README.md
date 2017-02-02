@@ -11,38 +11,30 @@ To deploy the sample application you first need to update the bash_setup.sh scri
 **To deploy the application**:
 
 1. Open `bash_setup.sh` in an editor and change the `target` variable to point to your cluster:
-    
+
         # Set the target cluster (e.g. your-cluster.apcera-platform.io):
         export target=your-cluster.example.com
-    
-    Save your changes to `bash_setup.sh`.   
-    
+
+    Save your changes to `bash_setup.sh`.
+
 3. Open a terminal window and move to the `example-bash-apptoken/` directory.
 4. Create the Bash application  and set the `target` environment variable to point to your cluster (e.g. `--env-set target=your-cluster.apcera-platform.io`):
-    
+
         apc app create example-bash-apptoken \
         --env-set target=your-cluster.example.com --disable-routes --batch
-        
-    
+
+
     During the staging process, bash_setup.sh is run, which downloads and extracts APC. The `--disable-routes` flag is used because the app doesn't listen on any ports.
 
 3. Bind the application to the HTTP service (required to use app tokens):
-    
+
         apc service bind /apcera::http --job example-bash-apptoken
 
 4. Using the APC or the [Web Console](https://docs.apcera.com/quickstart/console_tasks/#policy-editor) add the following policy to your cluster. Replace each instance of `<USER>` with your username:
-        
+
         // Permit cluster to issue a token to the job:
         job::/sandbox/<USER>::example-bash-apptoken {
             { permit issue }
-        }
-
-        // Set default namespace for job to /sandbox/<USER>:
-        auth::/ {
-          if (auth_server@apcera.me->name == "job::/sandbox/<USER>::example-bash-apptoken")
-          {
-            defaultNamespace "/sandbox/<USER>"
-          }
         }
 
         // Provide job admin permissions over the /sandbox/<USER> namespace:
@@ -52,9 +44,8 @@ To deploy the sample application you first need to update the bash_setup.sh scri
             }
         }
 
-
 5. Start the application using APC or the [Web Console](https://docs.apcera.com/quickstart/console_tasks/#starting-and-stopping-jobs):
-   
+
         apc app start example-bash-apptoken
 
 6. View the application logs using APC or the [Web Console](https://docs.apcera.com/quickstart/console_tasks/#tailing-job-logs):
@@ -63,13 +54,13 @@ To deploy the sample application you first need to update the bash_setup.sh scri
         [stdout][1b9ca501] Note: connections over HTTP are insecure and may leak secure information.
         [stdout][1b9ca501] Targeted [http://cosmic.apcera-platform.io]
         [stdout][1b9ca501] Connecting to http://cosmic.apcera-platform.io...
-        [stdout][1b9ca501] Login successful for 
+        [stdout][1b9ca501] Login successful for
         [stdout][1b9ca501] Working in "/sandbox/admin"
         [stdout][1b9ca501] +-------------------------------------+------+----------------+---------+-----------+
         [stdout][1b9ca501] | Name                                | Type | Namespace      | Status  | Instances |
         [stdout][1b9ca501] +-------------------------------------+------+----------------+---------+-----------+
         [stdout][1b9ca501] | example-bash-apptoken               | app  | /sandbox/admin | started | 1/1       |
         [stdout][1b9ca501] | example-bash-apptoken/http/3cfde8b4 | job  | /sandbox/admin | started | 1/1       |
-        [stdout][1b9ca501] +-------------------------------------+------+----------------+---------+-----------+ 
-        
+        [stdout][1b9ca501] +-------------------------------------+------+----------------+---------+-----------+
+
     ![Alt text](logs.png "Optional title")
