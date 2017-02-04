@@ -4,7 +4,7 @@ Contains the Dockerfile and startup scripts to run a Jenkins cluster on Apcera. 
 
 # Build the Docker image
 
-Please adjust line 4 of the Dockerfile to point to your own Apcera Cluster so the appropriate APC version will be installed. When done, you can build the Docker image and push it to a public registry.
+Using the Dockerfile, build a Jenkins Docker image and push it to a public registry.
 ```
 cd jenkins
 docker build -t my-repo/jenkins .
