@@ -74,9 +74,9 @@ func meanInstanceCPUUtil(iState []types.InstanceState) (float64, error) {
 
 // cpuUtilization returns the percentage of CPU used of a given instance.
 func cpuUtilization(cpuUsed, cpuTotal float64) (float64, error) {
-	//cpuUsed in nanosecond/second, cpuTotal in milisecond/second
+	//cpuUsed in nanosecond/second, cpuTotal in milliseconds/second
 	if cpuTotal == 0 {
-		return 0, fmt.Errorf("CPU Quota (CPU Total) not configured on the Job")
+		return 0, fmt.Errorf("CPU usage cannot be computed because CPU reservation not set on target job.")
 	}
 	return ((cpuUsed / cpuTotal) / 10000), nil
 }
